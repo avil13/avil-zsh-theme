@@ -1,13 +1,11 @@
 #!/bin/bash
 
-
-function _git_avil_promt() {
-  function _my_trim() {
-      echo $1 | sed -e 's/^[[:space:]]*//'
+# GIT PROMP
+_get_git_avil_prompt() {
+  _my_trim() {
+    echo $1 | sed -e 's/^[[:space:]]*//'
   }
-
   local GitPrompt=""
-  # if [ "x$(git symbolic-ref HEAD 2>&1 | grep fatal)" == "x" ]
   if git rev-parse --git-dir > /dev/null 2>&1
   then
     # has branch
@@ -22,6 +20,7 @@ function _git_avil_promt() {
       # format
       local gpPrefix="${gpColDelimiters}["
       local gpFirstHalf=""
+      local gpSecondHalf=""
       local gpSeparator="${gpColDelimiters}|"
       local gpSuffix="${gpColDelimiters}]$gpColReset "
       # prefixes
@@ -74,14 +73,12 @@ function _git_avil_promt() {
         gpFirstHalf="${gpFirstHalf}${gpFormatBehind}${gpBehind}"
       fi
 
-      if [ "x${gpFirstHalf}" == "x" ]
+    if [ -z "${gpFirstHalf}" ]
       then
         gpFirstHalf="${gpFormatEqual}"
       fi
-
       gpFirstHalf="${gpPrefix}${gpFormatBranch}${gpBranch}${gpFirstHalf}"
 
-      gpSecondHalf=""
       if [ "$gpCountStaged" -ne "0" ]
       then
         gpSecondHalf="${gpFormatStaged}${gpCountStaged}"
@@ -112,7 +109,7 @@ function _git_avil_promt() {
         gpSecondHalf="${gpSecondHalf}${gpFormatUnmerged}${gpCountUnmerged}"
       fi
 
-      if [ "x${gpSecondHalf}" == "x" ]
+      if [ -z "${gpSecondHalf}" ]
       then
         GitPrompt="${gpFirstHalf}${gpSuffix}"
       else
@@ -134,4 +131,6 @@ function _git_avil_promt() {
   fi
 }
 
-_git_avil_promt
+
+# TEST
+_get_git_avil_prompt
