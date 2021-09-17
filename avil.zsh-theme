@@ -34,6 +34,8 @@ _get_git_avil_prompt() {
       local gpFormatUntracked="\033[38;5;214m ?"
       local gpFormatStashes="\033[37m ≡"
       local gpFormatUnmerged="\033[38;5;160m ⊗"
+      local gpIsRebaseMessage=" \033[0;41mREBASE\033[0m"
+      local gpIsMergeMessage=" \033[0;41mMERGE\033[0m"
 
       # staged changes
       local gpCountStaged=$(_my_trim "$(git diff --name-status --staged | wc -l)")
@@ -55,23 +57,34 @@ _get_git_avil_prompt() {
 
       # default if upstream doesn't exist
       local gpAhead=$(_my_trim "$(git rev-list HEAD --not --remotes | wc -l)")
-      local gpBehind="0"
-      git show-ref --verify --quiet refs/remotes/origin/${gpBranch}
-      local gpUpExists=$?
-      # if the remote branch exists, compare to it
+      # local gpBehind="0"
+      # git show-ref --verify --quiet refs/remotes/origin/${gpBranch}
+      # local gpUpExists=$?
+      # # if the remote branch exists, compare to it
 
-      [ $gpUpExists -eq 0 ] && gpAhead=$(_my_trim "$(git rev-list HEAD --not origin/${gpBranch} | wc -l)")
-      [ $gpUpExists -eq 0 ] && gpBehind=$(_my_trim "$(git rev-list origin/${gpBranch} --not ${gpBranch} | wc -l)")
+      # [ $gpUpExists -eq 0 ] && gpAhead=$(_my_trim "$(git rev-list HEAD --not origin/${gpBranch} | wc -l)")
+      # [ $gpUpExists -eq 0 ] && gpBehind=$(_my_trim "$(git rev-list origin/${gpBranch} --not ${gpBranch} | wc -l)")
+
       # Formatting
+      if [ -f "$(git rev-parse --git-path REBASE_HEAD)" ]
+      then
+        gpFirstHalf="${gpFirstHalf}${gpIsRebaseMessage}"
+      fi
+
+      if [ -f "$(git rev-parse --git-path MERGE_HEAD)" ]
+      then
+        gpFirstHalf="${gpFirstHalf}${gpIsMergeMessage}"
+      fi
+
       if [ $gpAhead -ne "0" ]
       then
-        gpFirstHalf="${gpFormatAhead}${gpAhead}"
+        gpFirstHalf="${gpFirstHalf}${gpFormatAhead}${gpAhead}"
       fi
 
-      if [ $gpBehind -ne "0" ]
-      then
-        gpFirstHalf="${gpFirstHalf}${gpFormatBehind}${gpBehind}"
-      fi
+      # if [ $gpBehind -ne "0" ]
+      # then
+      #   gpFirstHalf="${gpFirstHalf}${gpFormatBehind}${gpBehind}"
+      # fi
 
     if [ -z "${gpFirstHalf}" ]
       then
