@@ -66,14 +66,17 @@ _get_git_avil_prompt() {
       # [ $gpUpExists -eq 0 ] && gpBehind=$(_my_trim "$(git rev-list origin/${gpBranch} --not ${gpBranch} | wc -l)")
 
       # Formatting
-      if [[ -f "$(git rev-parse --git-path REBASE_HEAD)" ]]
+      if [[ -d "$(git rev-parse --git-path rebase-merge)" ]]
       then
-        gpFirstHalf="${gpFirstHalf}${gpIsRebaseMessage}"
-      fi
+        if [[ -f "$(git rev-parse --git-path REBASE_HEAD)" ]]
+        then
+          gpFirstHalf="${gpFirstHalf}${gpIsRebaseMessage}"
+        fi
 
-      if [[ -f "$(git rev-parse --git-path MERGE_HEAD)" ]]
-      then
-        gpFirstHalf="${gpFirstHalf}${gpIsMergeMessage}"
+        if [[ -f "$(git rev-parse --git-path MERGE_HEAD)" ]]
+        then
+          gpFirstHalf="${gpFirstHalf}${gpIsMergeMessage}"
+        fi
       fi
 
       if [ $gpAhead -ne "0" ]
