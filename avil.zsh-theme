@@ -147,13 +147,32 @@ _get_git_avil_prompt() {
   fi
 }
 
+_folder_path_icon() {
+  HASH_NUM="$(md5 -s $(pwd) | sed  -E 's/[^0-9]//g' )"
+  ICON_INDEX=${HASH_NUM:0:2}
+  ICONS=(
+    "📁" "🗄️" "🏆" "💤" "🌀" "♠️" "♥️" "♦️" "♣️" "🃏"
+    "🖥️" "💻" "💽" "🖱️" "🖲️" "⌨️" "🖨️" "💾" "📀" "💿"
+    "🧅" "🕹️" "👨‍💻" "🐁" "🗜️" "🤖" "🔆" "⚜️" "🔱" "💠"
+    "🐻" "🙈" "🙉" "🙊" "🐕" "🐺" "🐈‍⬛" "🦁" "🐯" "🐴"
+    "🐇" "🐥" "🦆" "🦢" "🦉" "🦖" "🐉" "🐲" "🕷️" "🕸️"
+    "🌍" "🌑" "🌓" "🌖" "🌙" "☀️" "☁️" "🌪️" "❄️" "☄️"
+    "🔥" "⛄" "🌊" "💧" "❤️‍🔥" "❤️" "🍔" "🍏" "🍎" "🍒"
+    "🍐" "🥕" "🌶️" "🫑" "🍄" "🍕" "🥚" "🍿" "🥡" "☕"
+    "🧉" "🧊" "🫐" "🥦" "🍗" "🍇" "🍓" "🥥" "😜" "😎"
+    "🍶" "🍾" "🍷" "🍸" "🍹" "🍺" "🍻" "🥂" "🥃" "🥤"
+  )
+
+  echo ${ICONS[$ICON_INDEX]}
+}
+
 # settings
 typeset +H _current_dir="%{$fg_bold[cyan]%}%0~%{$reset_color%} "
 typeset +H _return_status=" %(?.✔.%{$fg[red]%}%?%f)"
 typeset +H _hist_no="%{$fg[grey]%}%h%{$reset_color%}"
 
 RPROMPT='${_return_status}'
-PROMPT='$(_get_git_avil_prompt)%{$fg[green]%}${:-%m}%{$reset_color%} ${_current_dir}
+PROMPT='$(_get_git_avil_prompt)$(_folder_path_icon)  ${_current_dir}
 %{%(!.%F{red}.%F{white})%}▶%{$reset_color%} '
 
 PROMPT2='%{%(!.%F{red}.%F{white})%}◀%{$reset_color%} '
@@ -167,5 +186,6 @@ export LS_COLORS='di=34;40:ln=35;40:so=32;40:pi=33;40:ex=31;40:bd=34;46:cd=34;43
 export GREP_COLOR='1;33'
 
 export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=4'
+
 
 
