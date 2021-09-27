@@ -4,6 +4,10 @@
 
 This is a zsh-theme that is convenient for a developer.
 
+To make it easier to remember which folder you are working in and not to make a mistake, a unique icon for each folder has been added.
+
+Better git repository status.
+
 ![avil-zsh-theme-demo](./assets/preview.png)
 
 # Instalation
@@ -22,7 +26,7 @@ This is a zsh-theme that is convenient for a developer.
 Clone
 
 ```sh
-git clone https://github.com/avil13/avil-zsh-theme.git ~/.oh-my-zsh/themes/avil --depth=1
+git clone https://github.com/avil13/avil-zsh-theme.git ~/.oh-my-zsh/themes/avil
 ```
 
 Setup
