@@ -103,7 +103,8 @@ _get_git_avil_prompt() {
 # endregion
 
 _folder_path_icon() {
-    HASH_NUM="$(printf '%d' "'$(pwd)" | sed -E 's/[^0-9]//g')"
+    # TODO: replace md5
+    HASH_NUM="$(md5 -s $(pwd) | sed  -E 's/[^0-9]//g' )"
     ICON_INDEX=${HASH_NUM:0:2}
     ICONS=(
         "📁" "🗄️" "🏆" "💤" "🌀" "♠️" "♥️" "♦️" "♣️" "🃏"
