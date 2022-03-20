@@ -2,9 +2,13 @@
 
 # region [GIT PROMP]
 _get_git_avil_prompt() {
+    # _trim() {
+    #     echo $1 | sed -e 's/^[[:space:]]*//'
+    # }
+
     if git rev-parse --git-dir >/dev/null 2>&1; then
         # we are in a git repo
-        if [ $(git branch | wc -l) -ne '0' ]; then
+        if [ $(git branch | wc -l | sed -e 's/^[[:space:]]*//') -ne '0' ]; then
             # has branch
             #region [colors]
             local GP_ColReset='\033[0m'
@@ -47,12 +51,12 @@ _get_git_avil_prompt() {
             # region [ GP_SecondHalf ]
 
             # default if upstream doesn't exist
-            local GP_Ahead=$(git rev-list HEAD --not --remotes | wc -l)
-            if [ $GP_Ahead -ne "0" ]; then
+            local GP_Ahead=$(git rev-list HEAD --not --remotes | wc -l | sed -e 's/^[[:space:]]*//')
+            if [ $GP_Ahead -ne '0' ]; then
                 GP_SecondHalf="${GP_SecondHalf}${GP_ICO_Ahead}${GP_Ahead}"
             fi
 
-            local GP_CountStaged=$(git diff --name-status --staged | wc -l)
+            local GP_CountStaged=$(git diff --name-status --staged | wc -l | sed -e 's/^[[:space:]]*//')
             if [ "$GP_CountStaged" -ne '0' ]; then
                 GP_SecondHalf="${GP_SecondHalf}${GP_ICO_Staged}${GP_CountStaged}"
             fi
@@ -70,26 +74,23 @@ _get_git_avil_prompt() {
                 GP_SecondHalf="${GP_SecondHalf}${GP_ICO_Del}${GP_CountDeleted}"
             fi
 
-            local GP_CountUntracked=$(git ls-files -o --exclude-standard | wc -l)
+            local GP_CountUntracked=$(git ls-files -o --exclude-standard | wc -l | sed -e 's/^[[:space:]]*//')
             if [ "$GP_CountUntracked" -ne '0' ]; then
                 GP_SecondHalf="${GP_SecondHalf}${GP_ICO_Untracked}${GP_CountUntracked}"
             fi
 
-            local GP_CountUnmerged=$(git ls-files --unmerged | cut -f2 | sort -u | wc -l)
+            local GP_CountUnmerged=$(git ls-files --unmerged | cut -f2 | sort -u | wc -l | sed -e 's/^[[:space:]]*//')
             if [ "$GP_CountUnmerged" -ne '0' ]; then
                 GP_SecondHalf="${GP_SecondHalf}${GP_ICO_Unmerged}${GP_CountUnmerged}"
             fi
 
-            local GP_CountStashes=$(git stash list | wc -l)
+            local GP_CountStashes=$(git stash list | wc -l | sed -e 's/^[[:space:]]*//')
             if [ "$GP_CountStashes" -ne '0' ]; then
                 GP_SecondHalf="${GP_SecondHalf}${GP_ICO_Stashes}${GP_CountStashes}"
             fi
             # endregion
 
             if [ -n "${GP_SecondHalf}" ]; then
-                # remove spaces
-                # GP_SecondHalf=$(echo $GP_SecondHalf | sed 's/ //g')
-                GP_SecondHalf=$(echo $GP_SecondHalf | sed -r 's/\d//g')
                 GP_SecondHalf="${GP_Separator}${GP_SecondHalf}"
             fi
 
@@ -104,7 +105,7 @@ _get_git_avil_prompt() {
 
 _folder_path_icon() {
     # TODO: replace md5
-    HASH_NUM="$(md5 -s $(pwd) | sed  -E 's/[^0-9]//g' )"
+    HASH_NUM="$(md5 -s $(pwd) | sed -E 's/[^0-9]//g')"
     ICON_INDEX=${HASH_NUM:0:2}
     ICONS=(
         "📁" "🗄️" "🏆" "💤" "🌀" "♠️" "♥️" "♦️" "♣️" "🃏"
