@@ -30,8 +30,8 @@ _get_git_avil_prompt() {
             local GP_ICO_Untracked="\033[38;5;214m ?"
             local GP_ICO_Stashes="\033[37m ≡"
             local GP_ICO_Unmerged="\033[38;5;160m ⊗"
-            local GP_IsRebaseMessage=" \033[0;41mREBASE\033[0m"
-            local GP_IsMergeMessage=" \033[0;41mMERGE\033[0m"
+            local GP_IsRebaseMessage="\033[0;41m REBASE \033[0m"
+            local GP_IsMergeMessage="\033[0;41m MERGE \033[0m"
             #endregion
 
             local GP_BRANCH="$(git rev-parse --abbrev-ref HEAD) ($(git rev-parse --short=5 HEAD))"
@@ -39,12 +39,10 @@ _get_git_avil_prompt() {
             # region [ REBASE]
             local GP_MERGE_OR_REBASE=""
 
-            if [[ -d "$(git rev-parse --git-path rebase-merge)" ]]; then
-                if [[ -f "$(git rev-parse --git-path REBASE_HEAD)" ]]; then
-                    GP_MERGE_OR_REBASE="${GP_IsRebaseMessage}"
-                elif [[ -f "$(git rev-parse --git-path MERGE_HEAD)" ]]; then
-                    GP_MERGE_OR_REBASE="${GP_IsMergeMessage}"
-                fi
+            if [[ -d "$(git rev-parse --git-path rebase-merge)" ]] && [[ -f "$(git rev-parse --git-path REBASE_HEAD)" ]]; then
+                GP_MERGE_OR_REBASE="${GP_IsRebaseMessage}"
+            elif [[ -f "$(git rev-parse --git-path MERGE_HEAD)" ]]; then
+                GP_MERGE_OR_REBASE="${GP_IsMergeMessage}"
             fi
             # endregion
 
