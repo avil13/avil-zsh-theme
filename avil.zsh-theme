@@ -32,6 +32,7 @@ _get_git_avil_prompt() {
             local GP_ICO_Unmerged="\033[38;5;160m ⊗"
             local GP_IsRebaseMessage="\033[0;41m REBASE \033[0m"
             local GP_IsMergeMessage="\033[0;41m MERGE \033[0m"
+            local GP_IsCherryMessage="\033[0;41m CHERRY \033[0m"
             #endregion
 
             local GP_BRANCH="$(git rev-parse --abbrev-ref HEAD) ($(git rev-parse --short=5 HEAD))"
@@ -43,6 +44,8 @@ _get_git_avil_prompt() {
                 GP_MERGE_OR_REBASE="${GP_IsRebaseMessage}"
             elif [[ -f "$(git rev-parse --git-path MERGE_HEAD)" ]]; then
                 GP_MERGE_OR_REBASE="${GP_IsMergeMessage}"
+            elif [[ -f "$(git rev-parse --git-path CHERRY_PICK_HEAD)" ]]; then
+                GP_MERGE_OR_REBASE="${GP_IsCherryMessage}"
             fi
             # endregion
 
