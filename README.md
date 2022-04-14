@@ -10,7 +10,7 @@ Better git repository status.
 
 ![avil-zsh-theme-demo](./assets/preview.png)
 
-# Instalation
+# Installation
 
 ## If you're not a zsh user
 
