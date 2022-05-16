@@ -112,7 +112,7 @@ _folder_path_icon() {
     fi
 
     if [ -x "$(command -v md5sum)" ]; then
-        P=$(md5sum -s "$P")
+        P=$(echo "$P" | md5sum)
     fi
 
     local HASH_NUM="$(echo "$P" | sed -E 's/[^0-9]//g')"
