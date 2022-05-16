@@ -1,6 +1,6 @@
 {
     "ignore": [],
     "watch": ["."],
-    "exec": "clear && bash ./test_speedup.sh",
+    "exec": "clear && bash ./test_dir_icon.sh",
     "ext": "sh"
   }
