@@ -139,7 +139,7 @@ typeset +H _return_status=" %(?.✔.%{$fg[red]%}%?%f)"
 typeset +H _hist_no="%{$fg[grey]%}%h%{$reset_color%}"
 
 RPROMPT='${_return_status}'
-PROMPT='$(_get_git_avil_prompt)$(_folder_path_icon $(pwd))  ${_current_dir}
+PROMPT='$(_get_git_avil_prompt)$(_folder_path_icon $(pwd)) ${_current_dir}
 %{%(!.%F{red}.%F{white})%}▶%{$reset_color%} '
 
 PROMPT2='%{%(!.%F{red}.%F{white})%}◀%{$reset_color%} '
