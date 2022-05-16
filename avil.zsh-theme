@@ -105,9 +105,18 @@ _get_git_avil_prompt() {
 # endregion
 
 _folder_path_icon() {
-    local HASH_ARR=( $(pwd | hexdump -o) )
-    local HASH_NUM=${HASH_ARR[${#HASH_ARR} - 1]}
-    local ICON_INDEX=${HASH_NUM:4:6}
+    local P="$1"
+
+    if [ -x "$(command -v md5)" ]; then
+        P=$(md5 -s "$P")
+    fi
+
+    if [ -x "$(command -v md5sum)" ]; then
+        P=$(md5sum -s "$P")
+    fi
+
+    local HASH_NUM="$(echo "$P" | sed -E 's/[^0-9]//g')"
+    local ICON_INDEX=${HASH_NUM:(${#HASH_NUM} - 2)}
     local ICONS=(
         "📁" "🗄️" "🏆" "💤" "🌀" "♠️" "♥️" "♦️" "♣️" "🃏"
         "🖥️" "💻" "💽" "🖱️" "🖲️" "⌨️" "🖨️" "💾" "📀" "💿"
@@ -130,7 +139,7 @@ typeset +H _return_status=" %(?.✔.%{$fg[red]%}%?%f)"
 typeset +H _hist_no="%{$fg[grey]%}%h%{$reset_color%}"
 
 RPROMPT='${_return_status}'
-PROMPT='$(_get_git_avil_prompt)$(_folder_path_icon)  ${_current_dir}
+PROMPT='$(_get_git_avil_prompt)$(_folder_path_icon $(pwd))  ${_current_dir}
 %{%(!.%F{red}.%F{white})%}▶%{$reset_color%} '
 
 PROMPT2='%{%(!.%F{red}.%F{white})%}◀%{$reset_color%} '
