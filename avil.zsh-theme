@@ -137,10 +137,15 @@ _folder_path_icon() {
 typeset +H _current_dir="%{$fg_bold[cyan]%}%0~%{$reset_color%} "
 typeset +H _return_status=" %(?.✔.%{$fg[red]%}%?%f)"
 typeset +H _hist_no="%{$fg[grey]%}%h%{$reset_color%}"
+typeset +H _PS_ICON='▶'
+
+if [[ $UID == 0 || $EUID == 0 ]]; then
+    typeset +H _PS_ICON="%{$fg_bold[red]%}#%{$reset_color%}"
+fi
 
 RPROMPT='${_return_status}'
 PROMPT='$(_get_git_avil_prompt)$(_folder_path_icon $(pwd)) ${_current_dir}
-%{%(!.%F{red}.%F{white})%}▶%{$reset_color%} '
+%{%(!.%F{red}.%F{white})%}${_PS_ICON}%{$reset_color%} '
 
 PROMPT2='%{%(!.%F{red}.%F{white})%}◀%{$reset_color%} '
 
