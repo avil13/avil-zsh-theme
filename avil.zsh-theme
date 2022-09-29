@@ -128,7 +128,7 @@ _folder_path_icon() {
 }
 
 # settings
-typeset +H _current_dir="%{$FG[008]%}%0~%{$reset_color%}"
+typeset +H _current_dir="%{$FG[014]%}%0~%{$reset_color%}"
 typeset +H _return_status=" %(?.✔.%{$fg[red]%}%?%f)"
 typeset +H _hist_no="%{$fg[grey]%}%h%{$reset_color%}"
 typeset +H _PS_ICON='▶'
