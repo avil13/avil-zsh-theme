@@ -131,7 +131,7 @@ _folder_path_icon() {
 typeset +H _current_dir="%{$FG[014]%}%0~%{$reset_color%}"
 typeset +H _return_status=" %(?.✔.%{$fg[red]%}%?%f)"
 typeset +H _hist_no="%{$fg[grey]%}%h%{$reset_color%}"
-typeset +H _PS_ICON='▶'
+typeset +H _PS_ICON='❯'
 
 if [[ $UID == 0 || $EUID == 0 ]]; then
     typeset +H _PS_ICON="%{$fg_bold[red]%}#%{$reset_color%}"
