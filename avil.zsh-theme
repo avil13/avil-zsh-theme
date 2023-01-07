@@ -139,7 +139,7 @@ fi
 
 RPROMPT='${_return_status}'
 PROMPT='$(_get_git_avil_prompt)$(_folder_path_icon $(pwd)) ${_current_dir}
-%{%(!.%F{red}.%F{white})%}${_PS_ICON}%{$reset_color%} '
+%{%(!.%F{red}.%F{blue})%}${_PS_ICON}%{$reset_color%} '
 
 PROMPT2='%{%(!.%F{red}.%F{white})%}◀%{$reset_color%} '
 
