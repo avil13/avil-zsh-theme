@@ -98,7 +98,7 @@ _get_git_avil_prompt() {
             echo -e "${GP_ICO_Prefix}${GP_COLOR_Branch}${GP_BRANCH}${GP_MERGE_OR_REBASE}${GP_SecondHalf}${GP_ICO_Suffix}"
         #
         else
-            echo -ne "$\033[0;35m [no branch] \033[0m"
+            echo -ne "\033[0;35m[no branch] \033[0m"
         fi
     fi
 }
