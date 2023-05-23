@@ -2,13 +2,17 @@
 
 ---
 
+The fastest and most informative zsh theme
+
+---
+
 This is a zsh-theme that is convenient for a developer.
 
-To make it easier to remember which folder you are working in and not to make a mistake, a unique icon for each folder has been added.
+To make it easier to remember which folder you are working in and not to make a mistake.
 
-Better git repository status.
+## Better git repository status.
 
-![avil-zsh-theme-demo](./assets/preview.png)
+![avil-zsh-theme-demo](./assets/konsole.avif)
 
 # Installation
 
