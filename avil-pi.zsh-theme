@@ -1,6 +1,5 @@
 # AVIL ZSH Theme
 
-
 function get_temp {
     local TEMPER="$(cat /sys/devices/virtual/thermal/thermal_zone1/temp)"
     echo "\033[38;5;8m${TEMPER:0:2}°C\033[m"
@@ -8,108 +7,94 @@ function get_temp {
 
 # region [GIT PROMP]
 _get_git_avil_prompt() {
-    # _trim() {
-    #     echo $1 | sed -e 's/^[[:space:]]*//'
-    # }
+    local off='\033[0m' # Text Reset
+    # Regular Colors
+    local redBG='\033[0;41m'
+    local red='\033[0;31m'
+    local green='\033[0;32m'
+    local yellow='\033[0;33m'
+    local blue='\033[0;34m'
+    local purple='\033[0;35m'
+    local cyan='\033[0;36m'
+    local gray='\033[37m'
 
-    if git rev-parse --git-dir >/dev/null 2>&1; then
-        # we are in a git repo
-        if [ $(git branch | wc -l | sed -e 's/^[[:space:]]*//') -ne '0' ]; then
-            # has branch
-            #region [colors]
-            local GP_ColReset='\033[0m'
-            local GP_ColDelimiters='\033[38;5;202m'
-            # format
-            local GP_ICO_Prefix="${GP_ColDelimiters}["
-            local GP_FirstHalf=""
-            local GP_SecondHalf=""
-            local GP_Separator="${GP_ColDelimiters}|"
-            local GP_ICO_Suffix="${GP_ColDelimiters}]$GP_ColReset "
-            # prefixes
-            local GP_COLOR_Branch="\033[38;5;5m"
-            local GP_ICO_Ahead="\033[38;5;39m ↑"
-            # local GP_Behind="\033[38;5;196m ↓" # deprecated
-            local GP_Equal="\033[38;5;46m ✔"
-            local GP_ICO_Staged="\033[38;5;48m ●"
-            local GP_ICO_Edit="\033[38;5;27m ✚"
-            local GP_ICO_Del="\033[38;5;160m ✖"
-            local GP_ICO_Untracked="\033[38;5;214m ?"
-            local GP_ICO_Stashes="\033[37m ≡"
-            local GP_ICO_Unmerged="\033[38;5;160m ⊗"
-            local GP_IsRebaseMessage="\033[0;41m REBASE \033[0m"
-            local GP_IsMergeMessage="\033[0;41m MERGE \033[0m"
-            local GP_IsCherryMessage="\033[0;41m CHERRY \033[0m"
-            #endregion
+    local REPO_PATH BRANCH HASH MODE STATE_TMP PROMPT STATUS
 
-            local GP_BRANCH="$(git rev-parse --abbrev-ref HEAD) ($(git rev-parse --short=5 HEAD))"
+    REPO_PATH=$(git rev-parse --git-dir 2>/dev/null)
 
-            # region [ REBASE]
-            local GP_MERGE_OR_REBASE=""
+    if [[ -e "$REPO_PATH" ]]; then
+        PROMPT=$off
+        STATUS=$(git status --porcelain -uall | cut -c 1,2)
+        BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+        HASH="$(git rev-parse --short=5 HEAD)"
 
-            if [[ -d "$(git rev-parse --git-path rebase-merge)" ]] && [[ -f "$(git rev-parse --git-path REBASE_HEAD)" ]]; then
-                GP_MERGE_OR_REBASE="${GP_IsRebaseMessage}"
-            elif [[ -f "$(git rev-parse --git-path MERGE_HEAD)" ]]; then
-                GP_MERGE_OR_REBASE="${GP_IsMergeMessage}"
-            elif [[ -f "$(git rev-parse --git-path CHERRY_PICK_HEAD)" ]]; then
-                GP_MERGE_OR_REBASE="${GP_IsCherryMessage}"
-            fi
-            # endregion
-
-            # region [ GP_SecondHalf ]
-
-            # default if upstream doesn't exist
-            local GP_Ahead=$(git rev-list HEAD --not --remotes | wc -l | sed -e 's/^[[:space:]]*//')
-            if [ $GP_Ahead -ne '0' ]; then
-                GP_SecondHalf="${GP_SecondHalf}${GP_ICO_Ahead}${GP_Ahead}"
-            fi
-
-            local GP_CountStaged=$(git diff --name-status --staged | wc -l | sed -e 's/^[[:space:]]*//')
-            if [ "$GP_CountStaged" -ne '0' ]; then
-                GP_SecondHalf="${GP_SecondHalf}${GP_ICO_Staged}${GP_CountStaged}"
-            fi
-
-            # unstaged changes
-            local GP_Unstaged=$(git diff --name-status | cut -c 1)
-            local GP_CountModified=$(echo $GP_Unstaged | grep -c M)
-            local GP_CountDeleted=$(echo $GP_Unstaged | grep -c D)
-
-            if [ "$GP_CountModified" -ne '0' ]; then
-                GP_SecondHalf="${GP_SecondHalf}${GP_ICO_Edit}${GP_CountModified}"
-            fi
-
-            if [ "$GP_CountDeleted" -ne '0' ]; then
-                GP_SecondHalf="${GP_SecondHalf}${GP_ICO_Del}${GP_CountDeleted}"
-            fi
-
-            local GP_CountUntracked=$(git ls-files -o --exclude-standard | wc -l | sed -e 's/^[[:space:]]*//')
-            if [ "$GP_CountUntracked" -ne '0' ]; then
-                GP_SecondHalf="${GP_SecondHalf}${GP_ICO_Untracked}${GP_CountUntracked}"
-            fi
-
-            local GP_CountUnmerged=$(git ls-files --unmerged | cut -f2 | sort -u | wc -l | sed -e 's/^[[:space:]]*//')
-            if [ "$GP_CountUnmerged" -ne '0' ]; then
-                GP_SecondHalf="${GP_SecondHalf}${GP_ICO_Unmerged}${GP_CountUnmerged}"
-            fi
-
-            local GP_CountStashes=$(git stash list | wc -l | sed -e 's/^[[:space:]]*//')
-            if [ "$GP_CountStashes" -ne '0' ]; then
-                GP_SecondHalf="${GP_SecondHalf}${GP_ICO_Stashes}${GP_CountStashes}"
-            fi
-            # endregion
-
-            if [ -n "${GP_SecondHalf}" ]; then
-                GP_SecondHalf="${GP_Separator}${GP_SecondHalf}"
-            fi
-
-            echo -e "${GP_ICO_Prefix}${GP_COLOR_Branch}${GP_BRANCH}${GP_MERGE_OR_REBASE}${GP_SecondHalf}${GP_ICO_Suffix}"
-        #
-        else
-            echo -ne "\033[0;35m[no branch] \033[0m"
+        if [[ -e "${REPO_PATH}/BISECT_LOG" ]]; then
+            MODE="$redBG BISECT "
+        elif [[ -e "${REPO_PATH}/MERGE_HEAD" ]]; then
+            MODE="$redBG ↝ MERGE "
+        elif [[ -e "${REPO_PATH}/CHERRY_PICK_HEAD" ]]; then
+            MODE="$redBG 🜼 CHERRY "
+        elif [[ -e "${REPO_PATH}/rebase" || -e "${REPO_PATH}/rebase-apply" || -e "${REPO_PATH}/rebase-merge" ]]; then
+            MODE="$redBG ↸ REBASE "
         fi
+
+        # need push
+        STATE_TMP=$(git rev-list @ --not --remotes | wc -l | sed -e 's/^[[:space:]]*//')
+        if [ "$STATE_TMP" -ne '0' ]; then
+            PROMPT="$PROMPT $cyan↑$STATE_TMP"
+        fi
+
+        # staged
+        STATE_TMP=$(echo "$STATUS" | grep '^M' | wc -l)
+        if [ "$STATE_TMP" -ne '0' ]; then
+            PROMPT="$PROMPT $green●$STATE_TMP"
+        fi
+
+        # changed not staged
+        STATE_TMP=$(echo "$STATUS" | grep '.M' | wc -l)
+        if [ "$STATE_TMP" -ne '0' ]; then
+            PROMPT="$PROMPT $blue✚$STATE_TMP"
+        fi
+
+        # added
+        STATE_TMP=$(echo "$STATUS" | grep 'A' | wc -l)
+        if [ "$STATE_TMP" -ne '0' ]; then
+            PROMPT="$PROMPT $cyan⫯$STATE_TMP"
+        fi
+
+        # untracked
+        STATE_TMP=$(echo "$STATUS" | grep '??' | wc -l)
+        if [ "$STATE_TMP" -ne '0' ]; then
+            PROMPT="$PROMPT $yellow?$STATE_TMP"
+        fi
+
+        # conflict
+        STATE_TMP=$(echo "$STATUS" | grep 'UU' | wc -l)
+        if [ "$STATE_TMP" -ne '0' ]; then
+            PROMPT="$PROMPT $red⚔$STATE_TMP"
+        fi
+
+        # deleted
+        STATE_TMP=$(echo "$STATUS" | grep '.D' | wc -l)
+        if [ "$STATE_TMP" -ne '0' ]; then
+            PROMPT="$PROMPT $red✖$STATE_TMP"
+        fi
+        # both deleted
+        STATE_TMP=$(echo "$STATUS" | grep 'DD' | wc -l)
+        if [ "$STATE_TMP" -ne '0' ]; then
+            PROMPT="$PROMPT $red✘$STATE_TMP"
+        fi
+
+        # stash
+        STATE_TMP=$(git stash list | wc -l)
+        if [ "$STATE_TMP" -ne '0' ]; then
+            PROMPT="$PROMPT $gray≡$STATE_TMP"
+        fi
+
+        echo -e "${yellow}[${purple}${BRANCH} (${HASH})${MODE}${PROMPT}${yellow}]${off}"
     fi
 }
 # endregion
-
 
 # settings
 typeset +H _current_dir="%{$FG[014]%}%0~%{$reset_color%}"
