@@ -2,6 +2,8 @@
 
 # source ./avil.zsh-theme
 
+cd ~/git/projects/edox-lk-3
+
 # region [GIT PROMP]
 _get_git_avil_prompt() {
     local off='\033[0m' # Text Reset
@@ -33,6 +35,12 @@ _get_git_avil_prompt() {
             MODE="$redBG 🜼 CHERRY "
         elif [[ -e "${REPO_PATH}/rebase" || -e "${REPO_PATH}/rebase-apply" || -e "${REPO_PATH}/rebase-merge" ]]; then
             MODE="$redBG ↸ REBASE "
+        fi
+
+        # conflict
+        STATE_TMP=$(echo "$STATUS" | grep 'UU' | wc -l)
+        if [ "$STATE_TMP" -ne '0' ]; then
+            PROMPT="$PROMPT $red⚔$STATE_TMP"
         fi
 
         # need push
@@ -71,16 +79,10 @@ _get_git_avil_prompt() {
             PROMPT="$PROMPT $yellow↹$STATE_TMP"
         fi
 
-        # conflict
-        STATE_TMP=$(echo "$STATUS" | grep 'UU' | wc -l)
-        if [ "$STATE_TMP" -ne '0' ]; then
-            PROMPT="$PROMPT $red⚔$STATE_TMP"
-        fi
-
         # deleted
         STATE_TMP=$(echo "$STATUS" | grep '^D' | wc -l)
         if [ "$STATE_TMP" -ne '0' ]; then
-            PROMPT="$PROMPT $red✘$STATE_TMP"
+            PROMPT="$PROMPT $red⊖$STATE_TMP"
         fi
 
         # stash

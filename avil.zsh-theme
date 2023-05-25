@@ -33,6 +33,12 @@ _get_git_avil_prompt() {
             MODE="$redBG ↸ REBASE "
         fi
 
+        # conflict
+        STATE_TMP=$(echo "$STATUS" | grep 'UU' | wc -l)
+        if [ "$STATE_TMP" -ne '0' ]; then
+            PROMPT="$PROMPT $red⚔$STATE_TMP"
+        fi
+
         # need push
         STATE_TMP=$(git rev-list @ --not --remotes | wc -l | sed -e 's/^[[:space:]]*//')
         if [ "$STATE_TMP" -ne '0' ]; then
@@ -69,16 +75,10 @@ _get_git_avil_prompt() {
             PROMPT="$PROMPT $yellow↹$STATE_TMP"
         fi
 
-        # conflict
-        STATE_TMP=$(echo "$STATUS" | grep 'UU' | wc -l)
-        if [ "$STATE_TMP" -ne '0' ]; then
-            PROMPT="$PROMPT $red⚔$STATE_TMP"
-        fi
-
         # deleted
         STATE_TMP=$(echo "$STATUS" | grep '^D' | wc -l)
         if [ "$STATE_TMP" -ne '0' ]; then
-            PROMPT="$PROMPT $red✘$STATE_TMP"
+            PROMPT="$PROMPT $red⊖$STATE_TMP"
         fi
 
         # stash
