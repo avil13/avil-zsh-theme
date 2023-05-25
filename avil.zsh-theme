@@ -40,9 +40,15 @@ _get_git_avil_prompt() {
         fi
 
         # need push
-        STATE_TMP=$(git rev-list @ --not --remotes | wc -l | sed -e 's/^[[:space:]]*//')
+        STATE_TMP=$(git rev-list @ --not --remotes | wc -l)
         if [ "$STATE_TMP" -ne '0' ]; then
-            PROMPT="$PROMPT $cyan↑$STATE_TMP"
+            PROMPT="$PROMPT $cyan￪$STATE_TMP"
+        fi
+
+        # need pull
+        STATE_TMP=$(git rev-list --count @..origin/$BRANCH)
+        if [ "$STATE_TMP" -ne '0' ]; then
+            PROMPT="$PROMPT $cyan￬$STATE_TMP"
         fi
 
         # staged
