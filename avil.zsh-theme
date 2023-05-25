@@ -46,9 +46,11 @@ _get_git_avil_prompt() {
         fi
 
         # need pull
-        STATE_TMP=$(git rev-list --count @..origin/$BRANCH)
-        if [ "$STATE_TMP" -ne '0' ]; then
-            PROMPT="$PROMPT $cyan￬$STATE_TMP"
+        if [ -e "$REPO_PATH/refs/remotes/origin/$BRANCH" ]; then
+            STATE_TMP=$(git rev-list --count @..origin/$BRANCH)
+            if [ "$STATE_TMP" -ne '0' ]; then
+                PROMPT="$PROMPT $cyan￬$STATE_TMP"
+            fi
         fi
 
         # staged
