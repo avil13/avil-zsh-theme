@@ -47,16 +47,16 @@ _get_git_avil_prompt() {
             PROMPT="$PROMPT $green●$STATE_TMP"
         fi
 
+        # added
+        STATE_TMP=$(echo "$STATUS" | grep 'A' | wc -l)
+        if [ "$STATE_TMP" -ne '0' ]; then
+            PROMPT="$PROMPT $green⫯$STATE_TMP"
+        fi
+
         # changed not staged
         STATE_TMP=$(echo "$STATUS" | grep '.M' | wc -l)
         if [ "$STATE_TMP" -ne '0' ]; then
             PROMPT="$PROMPT $blue✚$STATE_TMP"
-        fi
-
-        # added
-        STATE_TMP=$(echo "$STATUS" | grep 'A' | wc -l)
-        if [ "$STATE_TMP" -ne '0' ]; then
-            PROMPT="$PROMPT $cyan⫯$STATE_TMP"
         fi
 
         # untracked
