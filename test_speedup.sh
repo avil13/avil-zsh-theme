@@ -2,7 +2,7 @@
 
 # source ./avil.zsh-theme
 
-# GIT PROMP
+# region [GIT PROMP]
 _get_git_avil_prompt() {
     local off='\033[0m' # Text Reset
     # Regular Colors
@@ -47,22 +47,28 @@ _get_git_avil_prompt() {
             PROMPT="$PROMPT $green●$STATE_TMP"
         fi
 
+        # added new
+        STATE_TMP=$(echo "$STATUS" | grep 'A' | wc -l)
+        if [ "$STATE_TMP" -ne '0' ]; then
+            PROMPT="$PROMPT$green𛲜$STATE_TMP"
+        fi
+
         # changed not staged
         STATE_TMP=$(echo "$STATUS" | grep '.M' | wc -l)
         if [ "$STATE_TMP" -ne '0' ]; then
             PROMPT="$PROMPT $blue✚$STATE_TMP"
         fi
 
-        # added
-        STATE_TMP=$(echo "$STATUS" | grep 'A' | wc -l)
-        if [ "$STATE_TMP" -ne '0' ]; then
-            PROMPT="$PROMPT $cyan⫯$STATE_TMP"
-        fi
-
         # untracked
         STATE_TMP=$(echo "$STATUS" | grep '??' | wc -l)
         if [ "$STATE_TMP" -ne '0' ]; then
             PROMPT="$PROMPT $yellow?$STATE_TMP"
+        fi
+
+        # untracked
+        STATE_TMP=$(echo "$STATUS" | grep 'R' | wc -l)
+        if [ "$STATE_TMP" -ne '0' ]; then
+            PROMPT="$PROMPT $yellow↹$STATE_TMP"
         fi
 
         # conflict
@@ -72,12 +78,7 @@ _get_git_avil_prompt() {
         fi
 
         # deleted
-        STATE_TMP=$(echo "$STATUS" | grep 'D' | wc -l)
-        if [ "$STATE_TMP" -ne '0' ]; then
-            PROMPT="$PROMPT $red✖$STATE_TMP"
-        fi
-        # both deleted
-        STATE_TMP=$(echo "$STATUS" | grep 'DD' | wc -l)
+        STATE_TMP=$(echo "$STATUS" | grep '^D' | wc -l)
         if [ "$STATE_TMP" -ne '0' ]; then
             PROMPT="$PROMPT $red✘$STATE_TMP"
         fi
@@ -92,6 +93,7 @@ _get_git_avil_prompt() {
     fi
 }
 # endregion
+
 
 # time _get_git_avil_prompt
 # echo '[x]----------------------------'

@@ -1,6 +1,6 @@
 {
     "ignore": [],
     "watch": ["."],
-    "exec": "clear && bash ./git_prompt.sh",
+    "exec": "clear && bash ./test_speedup.sh",
     "ext": "sh"
   }
