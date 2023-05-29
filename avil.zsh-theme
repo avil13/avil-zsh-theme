@@ -21,7 +21,7 @@ _get_git_avil_prompt() {
     if [[ -e "$REPO_PATH" ]]; then
         PROMPT=$off
 
-        if [[ -e "${REPO_PATH}/index" ]]; then
+        if [[ -e "${REPO_PATH}/logs/HEAD" ]]; then
             # git found
             STATUS=$(git status --porcelain -uall | cut -c 1,2)
             BRANCH="$(git rev-parse --abbrev-ref HEAD)"
@@ -43,17 +43,19 @@ _get_git_avil_prompt() {
                 PROMPT="$PROMPT$red ⚔$STATE_TMP"
             fi
 
-            # need push
-            STATE_TMP=$(git rev-list @ --not --remotes | wc -l | sed -e 's/^[[:space:]]*//')
-            if [ "$STATE_TMP" -ne '0' ]; then
-                PROMPT="$PROMPT$cyan ￪$STATE_TMP"
-            fi
-
-            # need pull
-            if [ -e "$REPO_PATH/refs/remotes/origin/$BRANCH" ]; then
-                STATE_TMP=$(git rev-list --count @..origin/$BRANCH)
+            if [[ -e "${REPO_PATH}/ORIG_HEAD" ]]; then
+                # need push
+                STATE_TMP=$(git rev-list @ --not --remotes | wc -l | sed -e 's/^[[:space:]]*//')
                 if [ "$STATE_TMP" -ne '0' ]; then
-                    PROMPT="$PROMPT$cyan ￬$STATE_TMP"
+                    PROMPT="$PROMPT$cyan ￪$STATE_TMP"
+                fi
+
+                # need pull
+                if [ -e "$REPO_PATH/refs/remotes/origin/$BRANCH" ]; then
+                    STATE_TMP=$(git rev-list --count @..origin/$BRANCH)
+                    if [ "$STATE_TMP" -ne '0' ]; then
+                        PROMPT="$PROMPT$cyan ￬$STATE_TMP"
+                    fi
                 fi
             fi
 
