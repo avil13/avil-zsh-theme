@@ -13,6 +13,7 @@ _get_git_avil_prompt() {
     local red='\033[0;31m'
     local green='\033[0;32m'
     local yellow='\033[0;33m'
+    local orange='\033[38;5;202m'
     local blue='\033[0;34m'
     local purple='\033[0;35m'
     local cyan='\033[0;36m'
@@ -24,83 +25,93 @@ _get_git_avil_prompt() {
 
     if [[ -e "$REPO_PATH" ]]; then
         PROMPT=$off
-        STATUS=$(git status --porcelain -uall | cut -c 1,2)
-        BRANCH="$(git rev-parse --abbrev-ref HEAD)"
-        HASH="$(git rev-parse --short=5 HEAD)"
 
-        if [[ -e "${REPO_PATH}/BISECT_LOG" ]]; then
-            MODE="$redBG BISECT "
-        elif [[ -e "${REPO_PATH}/MERGE_HEAD" ]]; then
-            MODE="$redBG ↝ MERGE "
-        elif [[ -e "${REPO_PATH}/CHERRY_PICK_HEAD" ]]; then
-            MODE="$redBG 🜼 CHERRY "
-        elif [[ -e "${REPO_PATH}/rebase" || -e "${REPO_PATH}/rebase-apply" || -e "${REPO_PATH}/rebase-merge" ]]; then
-            MODE="$redBG ↸ REBASE "
-        fi
+        if [[ -e "${REPO_PATH}/index" ]]; then
+            # git found
+            STATUS=$(git status --porcelain -uall | cut -c 1,2)
+            BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+            HASH="$(git rev-parse --short=5 HEAD)"
 
-        # conflict
-        STATE_TMP=$(echo "$STATUS" | grep 'UU' | wc -l)
-        if [ "$STATE_TMP" -ne '0' ]; then
-            PROMPT="$PROMPT $red⚔$STATE_TMP"
-        fi
-
-        # need push
-        STATE_TMP=$(git rev-list @ --not --remotes | wc -l)
-        if [ "$STATE_TMP" -ne '0' ]; then
-            PROMPT="$PROMPT $cyan￪$STATE_TMP"
-        fi
-
-        # need pull
-        if [ -e "$REPO_PATH/refs/remotes/origin/$BRANCH" ]; then
-            STATE_TMP=$(git rev-list --count @..origin/$BRANCH)
-            if [ "$STATE_TMP" -ne '0' ]; then
-                PROMPT="$PROMPT $cyan￬$STATE_TMP"
+            if [[ -e "${REPO_PATH}/BISECT_LOG" ]]; then
+                MODE="$redBG BISECT "
+            elif [[ -e "${REPO_PATH}/MERGE_HEAD" ]]; then
+                MODE="$redBG ↝ MERGE "
+            elif [[ -e "${REPO_PATH}/CHERRY_PICK_HEAD" ]]; then
+                MODE="$redBG 🜼 CHERRY "
+            elif [[ -e "${REPO_PATH}/rebase" || -e "${REPO_PATH}/rebase-apply" || -e "${REPO_PATH}/rebase-merge" ]]; then
+                MODE="$redBG ↸ REBASE "
             fi
+
+            # conflict
+            STATE_TMP=$(echo "$STATUS" | grep 'UU' | wc -l | sed -e 's/^[[:space:]]*//')
+            if [ "$STATE_TMP" -ne '0' ]; then
+                PROMPT="$PROMPT$red ⚔$STATE_TMP"
+            fi
+
+            # need push
+            STATE_TMP=$(git rev-list @ --not --remotes | wc -l | sed -e 's/^[[:space:]]*//')
+            if [ "$STATE_TMP" -ne '0' ]; then
+                PROMPT="$PROMPT$cyan ￪$STATE_TMP"
+            fi
+
+            # need pull
+            if [ -e "$REPO_PATH/refs/remotes/origin/$BRANCH" ]; then
+                STATE_TMP=$(git rev-list --count @..origin/$BRANCH)
+                if [ "$STATE_TMP" -ne '0' ]; then
+                    PROMPT="$PROMPT$cyan ￬$STATE_TMP"
+                fi
+            fi
+
+            # staged
+            STATE_TMP=$(echo "$STATUS" | grep '^M' | wc -l | sed -e 's/^[[:space:]]*//')
+            if [ "$STATE_TMP" -ne '0' ]; then
+                PROMPT="$PROMPT$green ●$STATE_TMP"
+            fi
+
+            # added new
+            STATE_TMP=$(echo "$STATUS" | grep 'A' | wc -l | sed -e 's/^[[:space:]]*//')
+            if [ "$STATE_TMP" -ne '0' ]; then
+                PROMPT="$PROMPT$green 𛲜$STATE_TMP"
+            fi
+
+            # changed not staged
+            STATE_TMP=$(echo "$STATUS" | grep '.M' | wc -l | sed -e 's/^[[:space:]]*//')
+            if [ "$STATE_TMP" -ne '0' ]; then
+                PROMPT="$PROMPT$blue ✚$STATE_TMP"
+            fi
+
+            # untracked
+            STATE_TMP=$(echo "$STATUS" | grep '??' | wc -l | sed -e 's/^[[:space:]]*//')
+            if [ "$STATE_TMP" -ne '0' ]; then
+                PROMPT="$PROMPT$yellow ?$STATE_TMP"
+            fi
+
+            # untracked
+            STATE_TMP=$(echo "$STATUS" | grep 'R' | wc -l | sed -e 's/^[[:space:]]*//')
+            if [ "$STATE_TMP" -ne '0' ]; then
+                PROMPT="$PROMPT$yellow ↹$STATE_TMP"
+            fi
+
+            # deleted
+            STATE_TMP=$(echo "$STATUS" | grep '^D' | wc -l | sed -e 's/^[[:space:]]*//')
+            if [ "$STATE_TMP" -ne '0' ]; then
+                PROMPT="$PROMPT$red ⊖$STATE_TMP"
+            fi
+
+            # stash
+            STATE_TMP=$(git stash list | wc -l | sed -e 's/^[[:space:]]*//')
+            if [ "$STATE_TMP" -ne '0' ]; then
+                PROMPT="$PROMPT$gray ≡$STATE_TMP"
+            fi
+        else
+            # git only initialized
+            BRANCH='No commits'
+            HASH='-'
         fi
 
-        # staged
-        STATE_TMP=$(echo "$STATUS" | grep '^M' | wc -l)
-        if [ "$STATE_TMP" -ne '0' ]; then
-            PROMPT="$PROMPT $green●$STATE_TMP"
-        fi
+        PROMPT=$(echo $PROMPT | sed -e 's/^[[:space:]]*//')
 
-        # added new
-        STATE_TMP=$(echo "$STATUS" | grep 'A' | wc -l)
-        if [ "$STATE_TMP" -ne '0' ]; then
-            PROMPT="$PROMPT$green𛲜$STATE_TMP"
-        fi
-
-        # changed not staged
-        STATE_TMP=$(echo "$STATUS" | grep '.M' | wc -l)
-        if [ "$STATE_TMP" -ne '0' ]; then
-            PROMPT="$PROMPT $blue✚$STATE_TMP"
-        fi
-
-        # untracked
-        STATE_TMP=$(echo "$STATUS" | grep '??' | wc -l)
-        if [ "$STATE_TMP" -ne '0' ]; then
-            PROMPT="$PROMPT $yellow?$STATE_TMP"
-        fi
-
-        # untracked
-        STATE_TMP=$(echo "$STATUS" | grep 'R' | wc -l)
-        if [ "$STATE_TMP" -ne '0' ]; then
-            PROMPT="$PROMPT $yellow↹$STATE_TMP"
-        fi
-
-        # deleted
-        STATE_TMP=$(echo "$STATUS" | grep '^D' | wc -l)
-        if [ "$STATE_TMP" -ne '0' ]; then
-            PROMPT="$PROMPT $red⊖$STATE_TMP"
-        fi
-
-        # stash
-        STATE_TMP=$(git stash list | wc -l)
-        if [ "$STATE_TMP" -ne '0' ]; then
-            PROMPT="$PROMPT $gray≡$STATE_TMP"
-        fi
-
-        echo -e "${yellow}[${purple}${BRANCH} (${HASH})${MODE}${PROMPT}${yellow}]${off}"
+        echo -e "${orange}[${purple}${BRANCH} (${HASH})${MODE}${PROMPT}${orange}]${off}"
     fi
 }
 # endregion
