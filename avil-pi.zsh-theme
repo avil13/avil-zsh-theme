@@ -70,10 +70,22 @@ _get_git_avil_prompt() {
                 PROMPT="$PROMPT$green ●$STATE_TMP"
             fi
 
-            # added new
+            # new staged
             STATE_TMP=$(echo "$STATUS" | grep 'A' | wc -l | sed -e 's/^[[:space:]]*//')
             if [ "$STATE_TMP" -ne '0' ]; then
                 PROMPT="$PROMPT$green 𛲜$STATE_TMP"
+            fi
+
+            # deleted staged
+            STATE_TMP=$(echo "$STATUS" | grep '^D' | wc -l | sed -e 's/^[[:space:]]*//')
+            if [ "$STATE_TMP" -ne '0' ]; then
+                PROMPT="$PROMPT$green ⊝$STATE_TMP"
+            fi
+
+            # deleted
+            STATE_TMP=$(echo "$STATUS" | grep '.D' | wc -l | sed -e 's/^[[:space:]]*//')
+            if [ "$STATE_TMP" -ne '0' ]; then
+                PROMPT="$PROMPT$red ⊖$STATE_TMP"
             fi
 
             # changed not staged
@@ -92,12 +104,6 @@ _get_git_avil_prompt() {
             STATE_TMP=$(echo "$STATUS" | grep 'R' | wc -l | sed -e 's/^[[:space:]]*//')
             if [ "$STATE_TMP" -ne '0' ]; then
                 PROMPT="$PROMPT$yellow ↹$STATE_TMP"
-            fi
-
-            # deleted
-            STATE_TMP=$(echo "$STATUS" | grep '^D' | wc -l | sed -e 's/^[[:space:]]*//')
-            if [ "$STATE_TMP" -ne '0' ]; then
-                PROMPT="$PROMPT$red ⊖$STATE_TMP"
             fi
 
             # stash
