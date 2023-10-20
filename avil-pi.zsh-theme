@@ -1,11 +1,17 @@
 # AVIL ZSH Theme
 
+if [ -e "$ZSH/themes/avil/lib/functions.zsh" ]; then
+    source "$ZSH/themes/avil/lib/functions.zsh"
+else
+    echo "[oh-my-zsh] in avil theme '$ZSH/themes/avil/lib/functions.zsh' not found"
+fi
+
+
 function get_temp {
     local TEMPER="$(cat /sys/devices/virtual/thermal/thermal_zone1/temp)"
     echo "\033[38;5;8m${TEMPER:0:2}°C\033[m"
 }
 
-source "./lib/functions.zsh"
 
 # settings
 typeset +H _current_dir="%{$FG[014]%}%0~%{$reset_color%}"

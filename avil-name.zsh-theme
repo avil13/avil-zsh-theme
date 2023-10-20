@@ -1,6 +1,11 @@
 # AVIL ZSH Theme
 
-source "./lib/functions.zsh"
+if [ -e "$ZSH/themes/avil/lib/functions.zsh" ]; then
+    source "$ZSH/themes/avil/lib/functions.zsh"
+else
+    echo "[oh-my-zsh] in avil theme '$ZSH/themes/avil/lib/functions.zsh' not found"
+fi
+
 
 # settings
 typeset +H _current_dir="%{$FG[014]%}%0~%{$reset_color%}"
