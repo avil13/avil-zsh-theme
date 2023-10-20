@@ -5,7 +5,7 @@ function get_temp {
     echo "\033[38;5;8m${TEMPER:0:2}°C\033[m"
 }
 
-source ./lib/functions.zsh
+source "./lib/functions.zsh"
 
 # settings
 typeset +H _current_dir="%{$FG[014]%}%0~%{$reset_color%}"

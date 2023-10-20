@@ -1,6 +1,6 @@
 # AVIL ZSH Theme
 
-source ./lib/functions.zsh
+source "./lib/functions.zsh"
 
 # settings
 typeset +H _current_dir="%{$FG[014]%}%0~%{$reset_color%}"
