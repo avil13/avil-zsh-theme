@@ -1,10 +1,5 @@
 # AVIL ZSH Theme
 
-function get_temp {
-    local TEMPER="$(cat /sys/devices/virtual/thermal/thermal_zone1/temp)"
-    echo "\033[38;5;8m${TEMPER:0:2}°C\033[m"
-}
-
 # region [GIT PROMP]
 _get_git_avil_prompt() {
     local off='\033[0m' # Text Reset
@@ -124,6 +119,29 @@ _get_git_avil_prompt() {
 }
 # endregion
 
+_folder_path_icon() {
+    if [ -x "$(command -v md5)" ]; then
+        local P=$(md5 -s "$1")
+
+        local HASH_NUM="$(echo "$P" | sed -E 's/[^0-9]//g')"
+        local ICON_INDEX=${HASH_NUM:(${#HASH_NUM} - 2)}
+        local ICONS=(
+            "📁" "🏆" "💤" "🌀" "🃏" "🤘" "👌" "🎮" "😎" "🤑"
+            "💻" "💾" "💎" "🦅" "🏴" "👺" "🦎" "😈" "👾" "📄"
+            "🧅" "🐁" "🤖" "🔆" "💠" "💯" "☯" "🆒" "🧛" "😜"
+            "🐻" "🙈" "🙉" "🙊" "🐕" "🐺" "🦁" "🐯" "🐴" "🤡"
+            "🐇" "🐥" "🦆" "🦢" "🦉" "🦖" "🐉" "🐲" "🥴" "🧉"
+            "🌍" "🌑" "🌓" "🌖" "🌙" "🚀" "🎪" "💀" "☠️" "🤩"
+            "🔥" "⛄" "🌊" "💧" "🍔" "🍏" "🍎" "🍒" "🦹" "🧊"
+            "🍐" "🍄" "🍕" "🥚" "🍿" "🥡" "☕" "💴" "💸" "🍓"
+            "🍶" "🍾" "🍷" "🍸" "🍹" "🍺" "🍻" "🥂" "🥃" "🥤"
+            "🥦" "🍗" "🍇" "🥥" "🤠" "🌊" "🤤" "😼" "🖖" "🦄"
+        )
+
+        echo ${ICONS[$ICON_INDEX]}
+    fi
+}
+
 # settings
 typeset +H _current_dir="%{$FG[014]%}%0~%{$reset_color%}"
 typeset +H _return_status=" %(?.✔.%{$fg[red]%}%?%f)"
@@ -135,7 +153,7 @@ if [[ $UID == 0 || $EUID == 0 ]]; then
 fi
 
 RPROMPT='${_return_status}'
-PROMPT='%F{green}%n@%m%{$reset_color%} $(get_temp) $(_get_git_avil_prompt) ${_current_dir}
+PROMPT='%F{green}%n@%m%{$reset_color%} $(_get_git_avil_prompt)$(_folder_path_icon $(pwd)) ${_current_dir}
 %{%(!.%F{red}.%F{blue})%}${_PS_ICON}%{$reset_color%} '
 
 PROMPT2='%{%(!.%F{red}.%F{white})%}◀%{$reset_color%} '

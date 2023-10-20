@@ -148,7 +148,45 @@ _folder_path_icon() {
     echo ${ICONS[$ICON_INDEX]}
 }
 
+
+_new_prompt() {
+    local off='\033[0m' # Text Reset
+    local BLUE="\e[38;5;4m"
+    local GREEN="\e[38;5;35m"
+    local GREEN_BG="\e[3;30;46m"
+    local GREEN_BG2="\e[2;32;46m"
+
+    echo -e "${GREEN_BG2}【】⟬...⟭...⟫ ${off}\n${BLUE}❯${off}"
+}
+
 time _get_git_avil_prompt
 echo '[x]----------------------------'
 _get_git_avil_prompt
+echo
+_new_prompt
 echo '-------------------------------'
+
+
+# All colors
+
+# for x in {0..8}; do
+#     for i in {30..37}; do
+#         for a in {40..47}; do
+#             echo -ne "\e[$x;$i;$a""m\\\e[$x;$i;$a""m\e[0;37;40m "
+#         done
+#         echo
+#     done
+# done
+# echo ""
+
+# for fgbg in 38 48 ; do # Foreground / Background
+#     for color in {0..255} ; do # Colors
+#         # Display the color
+#         echo -en "\e[${fgbg};5;${color}m \\\e[${fgbg};5;${color}m \t\e[0m"
+#         # Display 10 colors per line
+#         if [ $((($color + 1) % 10)) == 0 ] ; then
+#             echo # New line
+#         fi
+#     done
+#     echo # New line
+# done
