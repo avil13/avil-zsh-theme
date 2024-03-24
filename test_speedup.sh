@@ -148,16 +148,47 @@ _folder_path_icon() {
     echo ${ICONS[$ICON_INDEX]}
 }
 
-
 _new_prompt() {
     local off='\033[0m' # Text Reset
     local BLUE="\e[38;5;4m"
     local GREEN="\e[38;5;35m"
-    local GREEN_BG="\e[3;30;46m"
+    local FG="\e[0;36m"
+    local BG="\e[0;46m"
     local GREEN_BG2="\e[2;32;46m"
 
-    echo -e "${GREEN_BG2}【】⟬...⟭...⟫ ${off}\n${BLUE}❯${off}"
+# ✘
+# 
+# 
+# 【】⟬...⟭...⟫ ❯
+
+    echo -e "${BG} ~/sd/sd/f ${off}${FG}${off}\n${BLUE}❯${off}"
+    echo -e "\e[31;47mКрасный текст на белом фоне\e[0m"
 }
+
+shorten_path() {
+    # Заменяем начальный путь $HOME на ~
+    local path="${PWD/#$HOME/~}"
+    echo $path
+    # Сжимаем путь, оставляя только первые буквы каждого компонента
+    local old_IFS="$IFS" # Сохраняем старое значение IFS
+    local IFS='/'        # Поле разделителя для массива
+    local parts=($path)  # Создаем массив из пути
+    local newpath=""
+    for part in "${parts[@]}"; do
+        # Добавляем только первую букву каждой части, если она не пустая
+        if [ -n "$part" ]; then
+            newpath+="/${part:0:1}"
+        fi
+    done
+    local IFS="$old_IFS" # Восстанавливаем исходное значение IFS
+    # Сохраняем результат в глобальной переменной
+    echo $newpath
+}
+
+# Использование функции
+echo '++++'
+time shorten_path
+echo '++++'
 
 time _get_git_avil_prompt
 echo '[x]----------------------------'
@@ -165,7 +196,6 @@ _get_git_avil_prompt
 echo
 _new_prompt
 echo '-------------------------------'
-
 
 # All colors
 

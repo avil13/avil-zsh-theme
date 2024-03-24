@@ -18,7 +18,7 @@ if [[ $UID == 0 || $EUID == 0 ]]; then
 fi
 
 RPROMPT='${_return_status}'
-PROMPT='%F{green}%n@%m%{$reset_color%} $(_get_git_avil_prompt)$(_folder_path_icon $(pwd))${_current_dir}
+PROMPT='%F{green}%n@%m%{$reset_color%} $(_get_git_avil_prompt)${_current_dir}
 %{%(!.%F{red}.%F{blue})%}${_PS_ICON}%{$reset_color%} '
 
 PROMPT2='%{%(!.%F{red}.%F{white})%}◀%{$reset_color%} '

@@ -113,32 +113,7 @@ _get_git_avil_prompt() {
 
         PROMPT=$(echo $PROMPT | sed -e 's/^[[:space:]]*//')
 
-        echo -e "${orange}[${purple}${BRANCH} (${HASH})${MODE}${PROMPT}${orange}]${off} "
-    fi
-}
-# endregion
-
-# region [FOLDER ICON]
-_folder_path_icon() {
-    if [ -x "$(command -v md5)" ]; then
-        local P=$(md5 -s "$1")
-
-        local HASH_NUM="$(echo "$P" | sed -E 's/[^0-9]//g')"
-        local ICON_INDEX=${HASH_NUM:(${#HASH_NUM} - 2)}
-        local ICONS=(
-            "📁" "🏆" "💤" "🌀" "🃏" "🤘" "👌" "🎮" "😎" "🤑"
-            "💻" "💾" "💎" "🦅" "🏴" "👺" "🦎" "😈" "👾" "📄"
-            "🧅" "🐁" "🤖" "🔆" "💠" "💯" "☯" "🆒" "🧛" "😜"
-            "🐻" "🙈" "🙉" "🙊" "🐕" "🐺" "🦁" "🐯" "🐴" "🤡"
-            "🐇" "🐥" "🦆" "🦢" "🦉" "🦖" "🐉" "🐲" "🥴" "🧉"
-            "🌍" "🌑" "🌓" "🌖" "🌙" "🚀" "🎪" "💀" "☠️" "🤩"
-            "🔥" "⛄" "🌊" "💧" "🍔" "🍏" "🍎" "🍒" "🦹" "🧊"
-            "🍐" "🍄" "🍕" "🥚" "🍿" "🥡" "☕" "💴" "💸" "🍓"
-            "🍶" "🍾" "🍷" "🍸" "🍹" "🍺" "🍻" "🥂" "🥃" "🥤"
-            "🥦" "🍗" "🍇" "🥥" "🤠" "🌊" "🤤" "😼" "🖖" "🦄"
-        )
-
-        echo ${ICONS[$ICON_INDEX]}
+        echo -e "${orange}⟬${purple}${BRANCH} (${HASH})${MODE}${PROMPT}${orange}⟭${off}"
     fi
 }
 # endregion
