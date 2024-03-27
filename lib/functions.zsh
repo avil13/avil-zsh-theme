@@ -3,17 +3,17 @@
 _get_git_avil_prompt() {
     local off='\033[0m' # Text Reset
     # Regular Colors
-    local cTitle='\033[2;31;43m'
+    local cTitle='\033[0;31;43m'
     local redBG='\033[0;35;41m'
 
-    local cIndex='\033[2;32;47m'
-    local cDeleted='\033[2;31;47m'
-    local cNew='\033[2;33;47m'
-    local cChanged='\033[2;34;47m'
-    local cPush='\033[2;34;47m'
-    local cStash='\033[2;37;47m'
+    local cIndex='\033[1;32;47m'
+    local cDeleted='\033[1;31;47m'
+    local cNew='\033[1;33;47m'
+    local cChanged='\033[1;34;47m'
+    local cPush='\033[1;34;47m'
+    local cStash='\033[1;30;47m'
     local cStart='\033[0;37;43m'
-    local cEnd="%{$BG[072]%}%{$FG[007]%}"
+    local cEnd="\033[0;37m%{$BG[072]%}"
 
     local REPO_PATH=$(git rev-parse --git-dir 2>/dev/null)
 
