@@ -15,7 +15,7 @@ if [ -z ./themes/lib/functions.zsh ]; then
 fi
 
 # settings
-typeset +H _current_dir="%{$BG[072]%}%{$FG[236]%} %0~%{$reset_color%}%{$FG[072]%}%{$reset_color%}"
+typeset +H _current_dir="%{$BG[072]%}%{$FG[236]%} %0~%{$reset_color%}%{$FG[072]%}%{$reset_color%}"
 typeset +H _return_status=" %(?.✔.%{$fg[red]%}%?%f)"
 typeset +H _hist_no="%{$fg[grey]%}%h%{$reset_color%}"
 typeset +H _PS_ICON='❯'
