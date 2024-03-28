@@ -3,17 +3,16 @@
 _get_git_avil_prompt() {
     local off='\033[0m' # Text Reset
     # Regular Colors
-    local cTitle='\033[48;5;130m'
+    local cOrange='\033[38;5;202m'
+    local cTitle='\033[38;5;212m' # local purple='\033[0;35m'
     local redBG='\033[0;35;41m'
 
-    local cIndex='\033[1;32;47m'
-    local cDeleted='\033[1;31;47m'
-    local cNew='\033[1;33;47m'
-    local cChanged='\033[1;34;47m'
-    local cPush='\033[1;34;47m'
-    local cStash='\033[1;30;47m'
-    local cStart='\033[37;3;130m'
-    local cEnd="\033[0;37m%{$BG[072]%}"
+    local cIndex='\033[0;32m' # green
+    local cDeleted='\033[0;31m' # red
+    local cNew='\033[0;33m' # yellow
+    local cChanged='\033[0;34m' # blue
+    local cPush='\033[0;36m' # cyan
+    local cStash='\033[0;37m' # gray
 
     local REPO_PATH=$(git rev-parse --git-dir 2>/dev/null)
 
@@ -21,7 +20,7 @@ _get_git_avil_prompt() {
         local BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
         local HASH=$(git rev-parse --short=5 HEAD 2>/dev/null)
         local STATUS=$(git status --porcelain -uall 2>/dev/null)
-        local PROMPT="${cStart}\033[0;33;47m "
+        local PROMPT=""
         local MODE=""
 
         [[ -e "${REPO_PATH}/BISECT_LOG" ]] && MODE="${redBG} BISECT "
@@ -41,19 +40,19 @@ _get_git_avil_prompt() {
         local RENAMED=$(echo "$STATUS" | grep -c 'R')
         local STASHED=$(git stash list | wc -l | tr -d ' ')
 
-        [[ $CONFLICT -ne 0 ]] && PROMPT+="${cDeleted}⚔${CONFLICT} "
-        [[ $NEED_PUSH -ne 0 ]] && PROMPT+="${cPush}￪${NEED_PUSH} "
-        [[ $NEED_PULL -ne 0 ]] && PROMPT+="${cPush}￬${NEED_PULL} "
-        [[ $STAGED -ne 0 ]] && PROMPT+="${cIndex}●${STAGED} "
-        [[ $NEW_STAGED -ne 0 ]] && PROMPT+="${cIndex}𛲜${NEW_STAGED} "
-        [[ $STAGED_DELETED -ne 0 ]] && PROMPT+="${cIndex}⊝${STAGED_DELETED} "
-        [[ $MODIFIED -ne 0 ]] && PROMPT+="${cChanged}✚${MODIFIED} "
-        [[ $UNTRACKED -ne 0 ]] && PROMPT+="${cNew}?${UNTRACKED} "
-        [[ $RENAMED -ne 0 ]] && PROMPT+="${cNew}↹${RENAMED} "
-        [[ $DELETED -ne 0 ]] && PROMPT+="${cDeleted}⊖${DELETED} "
-        [[ $STASHED -ne 0 ]] && PROMPT+="${cStash}≡${STASHED} "
+        [[ $CONFLICT -ne 0 ]] && PROMPT+=" ${cDeleted}⚔${CONFLICT}"
+        [[ $NEED_PUSH -ne 0 ]] && PROMPT+=" ${cPush}￪${NEED_PUSH}"
+        [[ $NEED_PULL -ne 0 ]] && PROMPT+=" ${cPush}￬${NEED_PULL}"
+        [[ $STAGED -ne 0 ]] && PROMPT+=" ${cIndex}●${STAGED}"
+        [[ $NEW_STAGED -ne 0 ]] && PROMPT+=" ${cIndex}𛲜${NEW_STAGED}"
+        [[ $STAGED_DELETED -ne 0 ]] && PROMPT+=" ${cIndex}⊝${STAGED_DELETED}"
+        [[ $MODIFIED -ne 0 ]] && PROMPT+=" ${cChanged}✚${MODIFIED}"
+        [[ $UNTRACKED -ne 0 ]] && PROMPT+=" ${cNew}?${UNTRACKED}"
+        [[ $RENAMED -ne 0 ]] && PROMPT+=" ${cNew}↹${RENAMED}"
+        [[ $DELETED -ne 0 ]] && PROMPT+=" ${cDeleted}⊖${DELETED}"
+        [[ $STASHED -ne 0 ]] && PROMPT+=" ${cStash}≡${STASHED}"
 
-        PROMPT="${cTitle} ${BRANCH} (${HASH})${MODE}${PROMPT}${cEnd}${off}"
+        PROMPT="${cOrange}⟬${off}${cTitle}${BRANCH} (${HASH})${MODE}${PROMPT}${cOrange}⟭${off}"
         echo -e "${PROMPT}"
     fi
 }
