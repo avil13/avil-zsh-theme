@@ -19,7 +19,7 @@ _get_git_avil_prompt() {
     if [[ -e "$REPO_PATH" ]]; then
         local BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
         local HASH=$(git rev-parse --short=5 HEAD 2>/dev/null)
-        local STATUS=$(git status --porcelain -uall 2>/dev/null)
+        local STATUS=$(git status --porcelain -uall | cut -c 1,2)
         local PROMPT=""
         local MODE=""
 
