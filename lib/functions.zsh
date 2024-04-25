@@ -49,7 +49,7 @@ _get_git_avil_prompt() {
         [[ $MODIFIED -ne 0 ]] && PROMPT+=" ${cChanged}✚${MODIFIED}"
         [[ $UNTRACKED -ne 0 ]] && PROMPT+=" ${cNew}?${UNTRACKED}"
         [[ $RENAMED -ne 0 ]] && PROMPT+=" ${cNew}↹${RENAMED}"
-        [[ $DELETED -ne 0 ]] && PROMPT+=" ${cDeleted}⊖${DELETED}"
+        [[ $DELETED -ne 0 ]] && PROMPT+=" ${cDeleted}⊝${DELETED}"
         [[ $STASHED -ne 0 ]] && PROMPT+=" ${cStash}≡${STASHED}"
 
         PROMPT="${cOrange}⟬${off}${cTitle}${BRANCH} (${HASH})${MODE}${PROMPT}${cOrange}⟭${off}"
