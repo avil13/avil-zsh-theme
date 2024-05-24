@@ -5,7 +5,7 @@ _get_git_avil_prompt() {
     # Regular Colors
     local cOrange='\033[38;5;202m'
     local cTitle='\033[38;5;212m' # local purple='\033[0;35m'
-    local redBG='\033[0;35;41m'
+    local redBG='\033[0;33;41m'
 
     local cIndex='\033[0;32m' # green
     local cDeleted='\033[0;31m' # red
