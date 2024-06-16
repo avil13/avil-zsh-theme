@@ -70,10 +70,11 @@ typeset +H _return_status=" %(?.✔.%{$fg[red]%}%?%f)"
 
 setopt PROMPT_SUBST
 
-RPROMPT='${_return_status}'
-PROMPT='$(_get_git_avil_prompt)%F{cyan}%~%f
+PROMPT='
+$(_get_git_avil_prompt)%F{cyan}%~%f
 %{%(!.%F{red}.%F{blue})%}${_PS_ICON}%f '
 PROMPT2='%{%(!.%F{red}.%F{white})%}◀%f'
+RPROMPT='${_return_status}'
 MODE_INDICATOR="%{$fg_bold[yellow]%}❮%f%{$fg[yellow]%}❮❮%f"
 
 # LS colors, made with https://geoff.greer.fm/lscolors/
