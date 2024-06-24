@@ -5,7 +5,7 @@ _get_git_avil_prompt() {
     # Regular Colors
     local cOrange='\033[38;5;202m'
     local cTitle='\033[38;5;212m' # local purple='\033[0;35m'
-    local redBG='\033[0;33;41m'
+    local redBG='\033[0;35;41m'
 
     local cIndex='\033[0;32m' # green
     local cDeleted='\033[0;31m' # red
@@ -41,14 +41,14 @@ _get_git_avil_prompt() {
         local STASHED=$(git stash list | wc -l | tr -d ' ')
 
         [[ $CONFLICT -ne 0 ]] && PROMPT+=" ${cDeleted}⚔${CONFLICT}"
-        [[ $NEED_PUSH -ne 0 ]] && PROMPT+=" ${cPush}￪${NEED_PUSH}"
-        [[ $NEED_PULL -ne 0 ]] && PROMPT+=" ${cPush}￬${NEED_PULL}"
+        [[ $NEED_PUSH -ne 0 ]] && PROMPT+=" ${cPush}↑${NEED_PUSH}"
+        [[ $NEED_PULL -ne 0 ]] && PROMPT+=" ${cPush}↓${NEED_PULL}"
         [[ $STAGED -ne 0 ]] && PROMPT+=" ${cIndex}●${STAGED}"
-        [[ $NEW_STAGED -ne 0 ]] && PROMPT+=" ${cIndex}𛲜${NEW_STAGED}"
-        [[ $STAGED_DELETED -ne 0 ]] && PROMPT+=" ${cIndex}⊝${STAGED_DELETED}"
-        [[ $MODIFIED -ne 0 ]] && PROMPT+=" ${cChanged}✚${MODIFIED}"
+        [[ $NEW_STAGED -ne 0 ]] && PROMPT+=" ${cIndex}⊗${NEW_STAGED}"
+        [[ $STAGED_DELETED -ne 0 ]] && PROMPT+=" ${cIndex}⊖${STAGED_DELETED}"
+        [[ $MODIFIED -ne 0 ]] && PROMPT+=" ${cChanged}+${MODIFIED}"
         [[ $UNTRACKED -ne 0 ]] && PROMPT+=" ${cNew}?${UNTRACKED}"
-        [[ $RENAMED -ne 0 ]] && PROMPT+=" ${cNew}↹${RENAMED}"
+        [[ $RENAMED -ne 0 ]] && PROMPT+=" ${cNew}↔${RENAMED}"
         [[ $DELETED -ne 0 ]] && PROMPT+=" ${cDeleted}⊝${DELETED}"
         [[ $STASHED -ne 0 ]] && PROMPT+=" ${cStash}≡${STASHED}"
 
