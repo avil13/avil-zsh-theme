@@ -71,7 +71,7 @@ typeset +H _return_status=" %(?.✔.%{$fg[red]%}%?%f)"
 setopt PROMPT_SUBST
 
 PROMPT='
-$%F{green}%n@%m%f (_get_git_avil_prompt)%F{cyan}%~%f
+%F{green}%n@%m%f $(_get_git_avil_prompt)%F{cyan}%~%f
 %{%(!.%F{red}.%F{blue})%}${_PS_ICON}%f '
 PROMPT2='%{%(!.%F{red}.%F{white})%}◀%f'
 RPROMPT='${_return_status}'
