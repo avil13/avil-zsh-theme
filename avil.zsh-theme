@@ -1,23 +1,26 @@
 # AVIL ZSH Theme
 
 # region [GIT PROMPT BUILDER]
-# Computes the full git prompt string for a given repo path
-_avil_build_git_prompt() {
+# Branch name only (fast; always fresh). Hash is in the cached tail.
+_avil_git_head_segment() {
+    local cTitle='\033[38;5;212m'
+    local BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+    echo -e "${cTitle}${BRANCH}"
+}
+
+# (HASH) + MODE + status icons (slow; cached as a whole)
+_avil_build_git_status_tail() {
     local REPO_PATH="$1"
     local IS_CACHE_HIT="$2"
 
-    local off='\033[0m' # Text Reset
-    # Regular Colors
-    local cOrange='\033[38;5;202m'
-    local cTitle='\033[38;5;212m' # local purple='\033[0;35m'
+    local cTitle='\033[38;5;212m'
     local redBG='\033[0;37;41m'
-
-    local cIndex='\033[0;32m' # green
-    local cDeleted='\033[0;31m' # red
-    local cNew='\033[0;33m' # yellow
-    local cChanged='\033[0;34m' # blue
-    local cPush='\033[0;36m' # cyan
-    local cStash='\033[0;37m' # gray
+    local cIndex='\033[0;32m'
+    local cDeleted='\033[0;31m'
+    local cNew='\033[0;33m'
+    local cChanged='\033[0;34m'
+    local cPush='\033[0;36m'
+    local cStash='\033[0;37m'
 
     local BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
     local HASH=$(git rev-parse --short=5 HEAD 2>/dev/null)
@@ -56,7 +59,13 @@ _avil_build_git_prompt() {
 
     [[ $IS_CACHE_HIT == 1 ]] && PROMPT+="⏱️"
 
-    echo -e "${cOrange}⟬${off}${cTitle}${BRANCH} (${HASH})${MODE}${PROMPT}${cOrange}⟭${off}"
+    echo -e "${cTitle} (${HASH})${MODE}${PROMPT}"
+}
+
+# Wrap head + tail in ⟬ ⟭ (shared by cache hit / miss)
+_avil_git_prompt_box_line() {
+    local off='\033[0m' cOrange='\033[38;5;202m'
+    echo -e "${cOrange}⟬${off}${1}${2}${cOrange}⟭${off}"
 }
 # endregion
 
@@ -65,25 +74,31 @@ _get_git_avil_prompt() {
     local REPO_PATH=$(git rev-parse --git-dir 2>/dev/null)
 
     if [[ -e "$REPO_PATH" ]]; then
-        local CACHE_FILE="${REPO_PATH}/.avil-git-prompt-cache"
+        # Cached tail starts with " (short-hash)"; branch name is always live in the head segment
+        local CACHE_FILE="${REPO_PATH}/.avil-git-prompt-cache.tail-v2"
 
-        # Cache hit: return cached result immediately, refresh in background
+        # Cache hit: branch fresh; hash + status from cache; refresh tail in background
         if [[ -f "$CACHE_FILE" ]]; then
-            command cat "$CACHE_FILE"
-            # async update cache
+            local _avil_head _avil_tail
+            _avil_head=$(_avil_git_head_segment)
+            _avil_tail=$(command cat "$CACHE_FILE")
+            _avil_git_prompt_box_line "$_avil_head" "$_avil_tail"
             {
-                _avil_build_git_prompt "$REPO_PATH" 1 > "${CACHE_FILE}.tmp" 2>/dev/null
+                _avil_build_git_status_tail "$REPO_PATH" 1 > "${CACHE_FILE}.tmp" 2>/dev/null
                 command mv -f "${CACHE_FILE}.tmp" "$CACHE_FILE" 2>/dev/null
             } >/dev/null 2>&1 &!
             return
         fi
 
-        # Cache miss: compute synchronously, enable cache if slow (>700ms)
+        # Cache miss: compute synchronously, enable cache if slow (>400ms)
         local _avil_t=$(( EPOCHREALTIME * 1000 ))
-        local _avil_result=$(_avil_build_git_prompt "$REPO_PATH")
+        local _avil_head _avil_tail _avil_result
+        _avil_head=$(_avil_git_head_segment)
+        _avil_tail=$(_avil_build_git_status_tail "$REPO_PATH")
+        _avil_result=$(_avil_git_prompt_box_line "$_avil_head" "$_avil_tail")
         printf '%s\n' "$_avil_result"
-        if (( (EPOCHREALTIME * 1000) - _avil_t > 350 )); then
-            printf '%s\n' "$_avil_result" > "$CACHE_FILE"
+        if (( (EPOCHREALTIME * 1000) - _avil_t > 400 )); then
+            printf '%s' "$_avil_tail" > "$CACHE_FILE"
         fi
     fi
 }
