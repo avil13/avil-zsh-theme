@@ -31,6 +31,7 @@ _avil_build_git_status_tail() {
     [[ -e "${REPO_PATH}/BISECT_LOG" ]] && MODE="${redBG} BISECT "
     [[ -e "${REPO_PATH}/MERGE_HEAD" ]] && MODE="${redBG} ↝ MERGE "
     [[ -e "${REPO_PATH}/CHERRY_PICK_HEAD" ]] && MODE="${redBG} 🜼 CHERRY "
+    [[ -e "${REPO_PATH}/REVERT_HEAD" ]] && MODE="${redBG} ↷ REVERT "
     [[ -e "${REPO_PATH}/rebase" || -e "${REPO_PATH}/rebase-apply" || -e "${REPO_PATH}/rebase-merge" ]] && MODE="${redBG} ↸ REBASE"
 
     local CONFLICT=$(echo "$STATUS" | grep -c 'UU')
