@@ -28,7 +28,7 @@ _get_git_avil_prompt() {
         [[ -e "${REPO_PATH}/CHERRY_PICK_HEAD" ]] && MODE="${redBG} 🜼 CHERRY "
         [[ -e "${REPO_PATH}/rebase" || -e "${REPO_PATH}/rebase-apply" || -e "${REPO_PATH}/rebase-merge" ]] && MODE="${redBG} ↸ REBASE"
 
-        local CONFLICT=$(echo "$STATUS" | grep -c 'UU')
+        local CONFLICT=$(echo "$STATUS" | grep -c -E '^(DD|AU|UD|UA|DU|AA|UU)$')
         local NEED_PUSH=$(git rev-list @ --not --remotes 2>/dev/null | wc -l | tr -d ' ')
         local NEED_PULL=$(git rev-list --count @..origin/$BRANCH 2>/dev/null)
         local STAGED=$(echo "$STATUS" | grep -c '^M')
