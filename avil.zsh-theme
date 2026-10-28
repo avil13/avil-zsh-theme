@@ -57,6 +57,7 @@ _avil_build_git_status_tail() {
     [[ $RENAMED -ne 0 ]] && PROMPT+=" ${cNew}↔${RENAMED}"
     [[ $DELETED -ne 0 ]] && PROMPT+=" ${cDeleted}⊝${DELETED}"
     [[ $STASHED -ne 0 ]] && PROMPT+=" ${cStash}≡${STASHED}"
+    [[ -f "${REPO_PATH}/commondir" ]] && PROMPT+=" ${cStash}w"
 
     [[ $IS_CACHE_HIT == 1 ]] && PROMPT+="⏱️"
 
