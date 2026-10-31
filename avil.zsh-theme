@@ -36,19 +36,25 @@ _avil_build_git_status_tail() {
 
     local -i CONFLICT=0 STAGED=0 NEW_STAGED=0 STAGED_DELETED=0
     local -i DELETED=0 MODIFIED=0 UNTRACKED=0 RENAMED=0
-    local entry xy
+    local entry xy x y
     for entry in "${(@f)STATUS}"; do
         xy=${entry[1,2]}
         case "$xy" in
-            DD|AU|UD|UA|DU|AA|UU) (( ++CONFLICT )) ;;
+            DD|AU|UD|UA|DU|AA|UU) (( ++CONFLICT )); continue ;;
+            '??') (( ++UNTRACKED )); continue ;;
         esac
-        [[ $xy == M? ]] && (( ++STAGED ))
-        [[ $xy == *A* ]] && (( ++NEW_STAGED ))
-        [[ $xy == D? ]] && (( ++STAGED_DELETED ))
-        [[ $xy == ?D ]] && (( ++DELETED ))
-        [[ $xy == ?M ]] && (( ++MODIFIED ))
-        [[ $xy == '??' ]] && (( ++UNTRACKED ))
-        [[ $xy == *R* ]] && (( ++RENAMED ))
+        x=${xy[1]}
+        y=${xy[2]}
+        case "$x" in
+            M) (( ++STAGED )) ;;
+            A) (( ++NEW_STAGED )) ;;
+            D) (( ++STAGED_DELETED )) ;;
+        esac
+        case "$y" in
+            M) (( ++MODIFIED )) ;;
+            D) (( ++DELETED )) ;;
+        esac
+        [[ $x == R || $y == R ]] && (( ++RENAMED ))
     done
     local NEED_PUSH=$(git rev-list --count @ --not --remotes 2>/dev/null)
     local NEED_PULL=$(git rev-list --count @..origin/$BRANCH 2>/dev/null)
