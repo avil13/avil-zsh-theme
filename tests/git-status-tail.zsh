@@ -25,17 +25,41 @@ stash_refs=''
 for conflict in DD AU UD UA DU AA UU; do
     local_status="$conflict conflict"
     result=$(_avil_build_git_status_tail /nonexistent "" main)
-    expected=$'\033[38;5;212m (abcde) \033[0;31m⚔1 \033[0;36m↑3 \033[0;36m↓2'
+    expected='%F{212} (abcde) %F{red}⚔1 %F{cyan}↑3 %F{cyan}↓2'
     [[ $result == "$expected" ]] || { print -u2 -- "Incorrect $conflict counters: $result"; exit 1; }
 done
 
 local_status='MM both'
 result=$(_avil_build_git_status_tail /nonexistent "" main)
-expected=$'\033[38;5;212m (abcde) \033[0;36m↑3 \033[0;36m↓2 \033[0;32m●1 \033[0;34m+1'
+expected='%F{212} (abcde) %F{cyan}↑3 %F{cyan}↓2 %F{green}●1 %F{blue}+1'
 [[ $result == "$expected" ]] || { print -u2 -- "Incorrect MM counters: $result"; exit 1; }
 
 local_status=''
 result=$(_avil_build_git_status_tail /nonexistent "" main)
-expected=$'\033[38;5;212m (abcde) \033[0;36m↑3 \033[0;36m↓2'
+expected='%F{212} (abcde) %F{cyan}↑3 %F{cyan}↓2'
 [[ $result == "$expected" ]] || { print -u2 -- "Unexpected clean status: $result"; exit 1; }
-print 'Git status counters: OK'
+# Prompt escapes in branch names must remain literal and count as visible text.
+COLUMNS=80
+branch='feature/%F{red}/100%'
+head=$(_avil_git_head_segment "$branch")
+[[ $head == '%F{212}feature/%%F{red}/100%%' ]] || { print -u2 'Branch escaping failed'; exit 1; }
+for width in ${#branch} $(( ${#branch} + 1 )); do
+    rendered=$(print -rP -- "${head}%(${width}l.YES.NO)")
+    if (( width == ${#branch} )); then
+        [[ $rendered == *YES ]] || exit 1
+    else
+        [[ $rendered == *NO ]] || exit 1
+    fi
+done
+
+sandbox=$(mktemp -d)
+trap 'rm -rf -- "$sandbox"' EXIT
+for marker in MERGE_HEAD rebase-merge; do
+    touch "$sandbox/$marker"
+    tail=$(_avil_build_git_status_tail "$sandbox" "" main)
+    [[ $tail == *'%K{red}'*'%k%f'* ]] || { print -u2 'Operation background not reset'; exit 1; }
+    box=$(_avil_git_prompt_box_line "$head" "$tail")
+    [[ $box != *$'\033'* && $box == *'%F{202}⟭%f%k' ]] || { print -u2 'Incorrect box formatting'; exit 1; }
+    rm "$sandbox/$marker"
+done
+print 'Git status counters and prompt formatting: OK'

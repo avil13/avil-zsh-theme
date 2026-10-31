@@ -3,10 +3,10 @@
 # region [GIT PROMPT BUILDER]
 # Branch name or detached HEAD hash (always fresh).
 _avil_git_head_segment() {
-    local cTitle='\033[38;5;212m'
+    local cTitle='%F{212}'
     local BRANCH="$1"
     [[ -n $BRANCH ]] || BRANCH=$(git rev-parse --short=5 HEAD 2>/dev/null)
-    echo -e "${cTitle}${BRANCH}"
+    print -r -- "${cTitle}${BRANCH//\%/%%}"
 }
 
 # (HASH) + MODE + status icons (slow; cached as a whole)
@@ -14,14 +14,14 @@ _avil_build_git_status_tail() {
     local REPO_PATH="$1"
     local IS_CACHE_HIT="$2"
 
-    local cTitle='\033[38;5;212m'
-    local redBG='\033[0;37;41m'
-    local cIndex='\033[0;32m'
-    local cDeleted='\033[0;31m'
-    local cNew='\033[0;33m'
-    local cChanged='\033[0;34m'
-    local cPush='\033[0;36m'
-    local cStash='\033[0;37m'
+    local cTitle='%F{212}'
+    local redBG='%F{white}%K{red}'
+    local cIndex='%F{green}'
+    local cDeleted='%F{red}'
+    local cNew='%F{yellow}'
+    local cChanged='%F{blue}'
+    local cPush='%F{cyan}'
+    local cStash='%F{white}'
 
     local BRANCH="$3"
     local HASH=$(git rev-parse --short=5 HEAD 2>/dev/null)
@@ -80,13 +80,14 @@ _avil_build_git_status_tail() {
 
     local hash_segment=""
     [[ -n $BRANCH && -n $HASH ]] && hash_segment=" (${HASH})"
-    echo -e "${cTitle}${hash_segment}${MODE}${PROMPT}"
+    [[ -n $MODE ]] && MODE+='%k%f'
+    print -r -- "${cTitle}${hash_segment}${MODE}${PROMPT}"
 }
 
 # Wrap head + tail in ⟬ ⟭ (shared by cache hit / miss)
 _avil_git_prompt_box_line() {
-    local off='\033[0m' cOrange='\033[38;5;202m'
-    echo -e "${cOrange}⟬${off}${1}${2}${cOrange}⟭${off}"
+    local off='%f%k' cOrange='%F{202}'
+    print -r -- "${cOrange}⟬${off}${1}${2}${cOrange}⟭${off}"
 }
 # endregion
 
@@ -96,7 +97,7 @@ _get_git_avil_prompt() {
 
     if [[ -e "$REPO_PATH" ]]; then
         # The head segment is always live; the tail may be cached.
-        local CACHE_FILE="${REPO_PATH}/.avil-git-prompt-cache.tail-v3"
+        local CACHE_FILE="${REPO_PATH}/.avil-git-prompt-cache.tail-v4"
         local BRANCH=$(git symbolic-ref --quiet --short HEAD 2>/dev/null)
 
         # Cache hit: branch fresh; hash + status from cache; refresh tail in background
