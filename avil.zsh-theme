@@ -1,10 +1,11 @@
 # AVIL ZSH Theme
 
 # region [GIT PROMPT BUILDER]
-# Branch name only (fast; always fresh). Hash is in the cached tail.
+# Branch name or detached HEAD hash (always fresh).
 _avil_git_head_segment() {
     local cTitle='\033[38;5;212m'
     local BRANCH="$1"
+    [[ -n $BRANCH ]] || BRANCH=$(git rev-parse --short=5 HEAD 2>/dev/null)
     echo -e "${cTitle}${BRANCH}"
 }
 
@@ -77,7 +78,9 @@ _avil_build_git_status_tail() {
 
     [[ $IS_CACHE_HIT == 1 ]] && PROMPT+="⏱️"
 
-    echo -e "${cTitle} (${HASH})${MODE}${PROMPT}"
+    local hash_segment=""
+    [[ -n $BRANCH && -n $HASH ]] && hash_segment=" (${HASH})"
+    echo -e "${cTitle}${hash_segment}${MODE}${PROMPT}"
 }
 
 # Wrap head + tail in ⟬ ⟭ (shared by cache hit / miss)
@@ -92,9 +95,9 @@ _get_git_avil_prompt() {
     local REPO_PATH=$(git rev-parse --git-dir 2>/dev/null)
 
     if [[ -e "$REPO_PATH" ]]; then
-        # Cached tail starts with " (short-hash)"; branch name is always live in the head segment
-        local CACHE_FILE="${REPO_PATH}/.avil-git-prompt-cache.tail-v2"
-        local BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+        # The head segment is always live; the tail may be cached.
+        local CACHE_FILE="${REPO_PATH}/.avil-git-prompt-cache.tail-v3"
+        local BRANCH=$(git symbolic-ref --quiet --short HEAD 2>/dev/null)
 
         # Cache hit: branch fresh; hash + status from cache; refresh tail in background
         if [[ -f "$CACHE_FILE" ]]; then
@@ -142,7 +145,7 @@ RPROMPT='${_return_status}'
 MODE_INDICATOR="%{$fg_bold[yellow]%}❮%f%{$fg[yellow]%}❮❮%f"
 
 # LS colors, made with https://geoff.greer.fm/lscolors/
-export LSCOLORS="exfxcxdxbxegedabagacad"
-export LS_COLORS='di=34;40:ln=35;40:so=32;40:pi=33;40:ex=31;40:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=0;42:ow=0;43:'
+export LSCOLORS="${LSCOLORS-exfxcxdxbxegedabagacad}"
+export LS_COLORS="${LS_COLORS-di=34;40:ln=35;40:so=32;40:pi=33;40:ex=31;40:bd=34;46:cd=34;43:su=0;41:sg=0;46:tw=0;42:ow=0;43:}"
 
-export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=8'
+export ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="${ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE-fg=8}"
