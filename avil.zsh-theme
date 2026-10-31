@@ -4,7 +4,7 @@
 # Branch name only (fast; always fresh). Hash is in the cached tail.
 _avil_git_head_segment() {
     local cTitle='\033[38;5;212m'
-    local BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+    local BRANCH="$1"
     echo -e "${cTitle}${BRANCH}"
 }
 
@@ -22,9 +22,9 @@ _avil_build_git_status_tail() {
     local cPush='\033[0;36m'
     local cStash='\033[0;37m'
 
-    local BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+    local BRANCH="$3"
     local HASH=$(git rev-parse --short=5 HEAD 2>/dev/null)
-    local STATUS=$(git status --porcelain -uall | cut -c 1,2)
+    local STATUS=$(git status --porcelain -uall)
     local PROMPT=""
     local MODE=""
 
@@ -34,17 +34,27 @@ _avil_build_git_status_tail() {
     [[ -e "${REPO_PATH}/REVERT_HEAD" ]] && MODE="${redBG} ↷ REVERT "
     [[ -e "${REPO_PATH}/rebase" || -e "${REPO_PATH}/rebase-apply" || -e "${REPO_PATH}/rebase-merge" ]] && MODE="${redBG} ↸ REBASE"
 
-    local CONFLICT=$(echo "$STATUS" | grep -c -E '^(DD|AU|UD|UA|DU|AA|UU)$')
-    local NEED_PUSH=$(git rev-list @ --not --remotes 2>/dev/null | wc -l | tr -d ' ')
+    local -i CONFLICT=0 STAGED=0 NEW_STAGED=0 STAGED_DELETED=0
+    local -i DELETED=0 MODIFIED=0 UNTRACKED=0 RENAMED=0
+    local entry xy
+    for entry in "${(@f)STATUS}"; do
+        xy=${entry[1,2]}
+        case "$xy" in
+            DD|AU|UD|UA|DU|AA|UU) (( ++CONFLICT )) ;;
+        esac
+        [[ $xy == M? ]] && (( ++STAGED ))
+        [[ $xy == *A* ]] && (( ++NEW_STAGED ))
+        [[ $xy == D? ]] && (( ++STAGED_DELETED ))
+        [[ $xy == ?D ]] && (( ++DELETED ))
+        [[ $xy == ?M ]] && (( ++MODIFIED ))
+        [[ $xy == '??' ]] && (( ++UNTRACKED ))
+        [[ $xy == *R* ]] && (( ++RENAMED ))
+    done
+    local NEED_PUSH=$(git rev-list --count @ --not --remotes 2>/dev/null)
     local NEED_PULL=$(git rev-list --count @..origin/$BRANCH 2>/dev/null)
-    local STAGED=$(echo "$STATUS" | grep -c '^M')
-    local NEW_STAGED=$(echo "$STATUS" | grep -c 'A')
-    local STAGED_DELETED=$(echo "$STATUS" | grep -c '^D')
-    local DELETED=$(echo "$STATUS" | grep -c '.D')
-    local MODIFIED=$(echo "$STATUS" | grep -c '.M')
-    local UNTRACKED=$(echo "$STATUS" | grep -c '??')
-    local RENAMED=$(echo "$STATUS" | grep -c 'R')
-    local STASHED=$(git stash list | wc -l | tr -d ' ')
+    local stash_refs=$(git stash list --format=%gd)
+    local -a stashes=(${(f)stash_refs})
+    local STASHED=${#stashes}
 
     [[ $CONFLICT -ne 0 ]] && PROMPT+=" ${cDeleted}⚔${CONFLICT}"
     [[ $NEED_PUSH -ne 0 ]] && PROMPT+=" ${cPush}↑${NEED_PUSH}"
@@ -78,15 +88,16 @@ _get_git_avil_prompt() {
     if [[ -e "$REPO_PATH" ]]; then
         # Cached tail starts with " (short-hash)"; branch name is always live in the head segment
         local CACHE_FILE="${REPO_PATH}/.avil-git-prompt-cache.tail-v2"
+        local BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
 
         # Cache hit: branch fresh; hash + status from cache; refresh tail in background
         if [[ -f "$CACHE_FILE" ]]; then
             local _avil_head _avil_tail
-            _avil_head=$(_avil_git_head_segment)
-            _avil_tail=$(command cat "$CACHE_FILE")
+            _avil_head=$(_avil_git_head_segment "$BRANCH")
+            _avil_tail=$(<"$CACHE_FILE")
             _avil_git_prompt_box_line "$_avil_head" "$_avil_tail"
             {
-                _avil_build_git_status_tail "$REPO_PATH" 1 > "${CACHE_FILE}.tmp" 2>/dev/null
+                _avil_build_git_status_tail "$REPO_PATH" 1 "$BRANCH" > "${CACHE_FILE}.tmp" 2>/dev/null
                 command mv -f "${CACHE_FILE}.tmp" "$CACHE_FILE" 2>/dev/null
             } >/dev/null 2>&1 &!
             return
@@ -95,8 +106,8 @@ _get_git_avil_prompt() {
         # Cache miss: compute synchronously, enable cache if slow (>400ms)
         local _avil_t=$(( EPOCHREALTIME * 1000 ))
         local _avil_head _avil_tail _avil_result
-        _avil_head=$(_avil_git_head_segment)
-        _avil_tail=$(_avil_build_git_status_tail "$REPO_PATH")
+        _avil_head=$(_avil_git_head_segment "$BRANCH")
+        _avil_tail=$(_avil_build_git_status_tail "$REPO_PATH" "" "$BRANCH")
         _avil_result=$(_avil_git_prompt_box_line "$_avil_head" "$_avil_tail")
         printf '%s\n' "$_avil_result"
         if (( (EPOCHREALTIME * 1000) - _avil_t > 400 )); then
