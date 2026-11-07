@@ -37,7 +37,19 @@ hash=$(git rev-parse --short=5 HEAD)
 result=$(_get_git_avil_prompt 2>"$sandbox/errors")
 [[ $result == *main* && $result == *"($hash)"* && ! -s "$sandbox/errors" ]] || fail 'Incorrect normal branch'
 
-git checkout -q --detach
+git update-ref refs/remotes/origin/feature HEAD
+git checkout -q --detach origin/feature
+# Later detached commits must not hide the checkout origin.
+print changed >> tracked
+git -c commit.gpgsign=false commit -qam changed
+hash=$(git rev-parse --short=5 HEAD)
 result=$(_get_git_avil_prompt 2>"$sandbox/errors")
-[[ $result == *"$hash"* && $result != *HEAD* && $result != *"($hash)"* && ! -s "$sandbox/errors" ]] || fail 'Incorrect detached HEAD'
+[[ $result == *"origin/feature detached $hash"* && $result != *"($hash)"* && ! -s "$sandbox/errors" ]] || fail 'Incorrect detached HEAD'
+print cached > .git/.avil-git-prompt-cache.tail-v4
+result=$(_get_git_avil_prompt)
+[[ $result == *"origin/feature detached $hash"* ]] || fail 'Cached tail hid detached origin'
+# No checkout history: still show the current hash and detached state.
+git reflog expire --expire=now --all
+result=$(_avil_git_head_segment '')
+[[ $result == "%F{212}detached $hash" ]] || fail 'Incorrect detached fallback'
 print 'Theme settings and HEAD states: OK'

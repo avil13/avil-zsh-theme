@@ -45,7 +45,10 @@ Enjoy =)
 ## Git prompt
 
 The Git segment shows the branch and short commit hash. Detached HEAD shows
-only the hash; a new repository without commits shows only the branch name.
+`<checkout target> detached <hash>`, using the latest checkout in the last 64
+HEAD reflog entries. This is a historical target, not an active branch; if no
+checkout is found, only `detached <hash>` is shown. Reflog lookup runs only for
+detached HEAD. A new repository without commits shows only the branch name.
 
 | Symbol | Meaning |
 | --- | --- |

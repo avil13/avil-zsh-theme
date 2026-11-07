@@ -5,7 +5,18 @@
 _avil_git_head_segment() {
     local cTitle='%F{212}'
     local BRANCH="$1"
-    [[ -n $BRANCH ]] || BRANCH=$(git rev-parse --short=5 HEAD 2>/dev/null)
+    if [[ -z $BRANCH ]]; then
+        local hash=$(git rev-parse --short=5 HEAD 2>/dev/null)
+        local entry origin='' history=$(git reflog -64 --format=%gs HEAD 2>/dev/null)
+        # Bound the lookup; old/expired checkout history falls back to the hash.
+        for entry in "${(@f)history}"; do
+            if [[ $entry == 'checkout: moving from '*' to '* ]]; then
+                origin=${entry##* to }
+                break
+            fi
+        done
+        BRANCH="${origin:+${origin} }detached ${hash}"
+    fi
     print -r -- "${cTitle}${BRANCH//\%/%%}"
 }
 
